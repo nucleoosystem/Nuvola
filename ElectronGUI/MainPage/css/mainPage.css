@@ -1,0 +1,153 @@
+@font-face {
+    font-family: 'BebasNeueRegular';
+    src: url('fonts/BebasNeue-webfont.eot');
+    src: url('fonts/BebasNeue-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/BebasNeue-webfont.woff') format('woff'), url('fonts/BebasNeue-webfont.ttf') format('truetype'), url('fonts/BebasNeue-webfont.svg#BebasNeueRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'FontomasCustomRegular';
+    line-height: 1.5em;
+}
+
+#header {
+    background: #ccc;
+    height: 100px;
+}
+
+#header h1 {
+    margin: 0;
+    padding-top: 15px;
+    margin-bottom: -10px;
+}
+
+main {
+    padding-bottom: 10010px;
+    margin-bottom: -10000px;
+    float: left;
+    width: 100%;
+}
+
+#nav {
+    padding-bottom: 10010px;
+    margin-bottom: -10000px;
+    float: left;
+    width: 230px;
+    height: calc(100vh - 110px);
+    margin-left: -100%;
+    background: #eee;
+}
+
+#footer {
+    clear: left;
+    width: 100%;
+    background: #ccc;
+    text-align: center;
+    padding: 4px 0;
+}
+
+#wrapper {
+    overflow: hidden;
+}
+
+#content {
+    margin-left: 230px;
+    /* Same as 'nav' width */
+}
+
+.innertube {
+    margin: 15px;
+    /* Padding for content */
+    margin-top: 0;
+}
+
+p {
+    color: #555;
+    font-family: 'PT Sans', sans-serif;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul a {
+    font-family: 'FontomasCustomRegular';
+    text-decoration: none;
+    color: black;
+}
+
+h1 {
+    font-family: 'PT Sans', sans-serif;
+    font-size: 35px;
+    line-height: 35px;
+    position: relative;
+    font-weight: 400;
+    color: rgba(26, 89, 120, 0.9);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+    padding: 0px 0px 5px 0px;
+}
+
+h3 {
+    font-family: 'PT Sans', sans-serif;
+    font-size: 20px;
+    line-height: 35px;
+    position: relative;
+    font-weight: 400;
+    color: rgba(26, 89, 120, 0.9);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+#navButtons {
+    margin-top: 10px;
+    width: 100%;
+	cursor: pointer;	
+	background: rgb(61, 157, 179);
+	padding: 8px 5px;
+	font-family: 'PT Sans', sans-serif;
+	color: #fff;
+	font-size: 24px;	
+	border: 1px solid rgb(28, 108, 122);	
+	margin-bottom: 10px;	
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;	
+	-webkit-box-shadow: 0px 1px 6px 4px rgba(0, 0, 0, 0.07) inset,
+	        0px 0px 0px 3px rgb(254, 254, 254),
+	        0px 5px 3px 3px rgb(210, 210, 210);
+	   -moz-box-shadow:0px 1px 6px 4px rgba(0, 0, 0, 0.07) inset,
+	        0px 0px 0px 3px rgb(254, 254, 254),
+	        0px 5px 3px 3px rgb(210, 210, 210);
+	        box-shadow:0px 1px 6px 4px rgba(0, 0, 0, 0.07) inset,
+	        0px 0px 0px 3px rgb(254, 254, 254),
+	        0px 5px 3px 3px rgb(210, 210, 210);
+	-webkit-transition: all 0.2s linear;
+	   -moz-transition: all 0.2s linear;
+	     -o-transition: all 0.2s linear;
+	        transition: all 0.2s linear;
+}
+
+#navButtons:hover{
+	background: rgb(74, 179, 198);
+}
+
+#navButtons:active{
+	background: rgb(40, 137, 154);
+	position: relative;
+	top: 1px;
+	border: 1px solid rgb(12, 76, 87);	
+	-webkit-box-shadow: 0px 1px 6px 4px rgba(0, 0, 0, 0.2) inset;
+	   -moz-box-shadow: 0px 1px 6px 4px rgba(0, 0, 0, 0.2) inset;
+	        box-shadow: 0px 1px 6px 4px rgba(0, 0, 0, 0.2) inset;
+}
+
+
+#usernameLabel {
+    font-family: 'PT Sans', sans-serif;
+    
+}
