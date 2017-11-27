@@ -1,0 +1,27 @@
+#pragma once
+
+#include <iostream>
+#include <string>
+#include <vector>
+//#include "Validator.h"
+#include "sqlite3.h"
+#include "Helper.h"
+#include <unordered_map>
+#include <ctime>
+
+using namespace std;
+
+class Database
+{
+public:
+	Database();
+	~Database();
+	bool doesUserExists(string name);
+	bool addNewUser(string username, string password, string email, string firstname, string lastname);
+	bool isUserAndPassMatch(string username, string password);
+
+	static int callback(void*, int, char**, char**);
+
+private:
+	sqlite3* db;
+};
