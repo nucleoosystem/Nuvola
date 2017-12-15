@@ -17,7 +17,7 @@ public:
 	Database();
 	~Database();
 	bool doesUserExists(string name);
-	bool addNewUser(string username, string password, string email, string firstname, string lastname);
+	bool addNewUser(string username, string password, string email, string cloudSize);
 	bool isUserAndPassMatch(string username, string password);
 
 	static int callback(void*, int, char**, char**);

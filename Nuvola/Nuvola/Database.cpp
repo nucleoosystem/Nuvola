@@ -70,7 +70,7 @@ bool Database::doesUserExists(string name)
 	return false;
 }
 
-bool Database::addNewUser(string username, string password, string email, string firstname, string lastname)
+bool Database::addNewUser(string username, string password, string email, string cloudSize)
 {
 	int rc;
 	sqlite3* db;
@@ -85,12 +85,11 @@ bool Database::addNewUser(string username, string password, string email, string
 		return false;
 	}
 
-	sqlQuery = "INSERT INTO t_users (username, password, email, firstname, lastname) VALUES(\'";
+	sqlQuery = "INSERT INTO t_users (username, password, email, cloudSize) VALUES(\'";
 	sqlQuery += username + "\',\'";
 	sqlQuery += password + "\',\'";
-	sqlQuery += email + "\',\'";
-	sqlQuery += firstname + "\',\'";
-	sqlQuery += lastname + "\')";
+	sqlQuery += email + "\',";
+	sqlQuery += cloudSize + ")";
 
 	rc = sqlite3_exec(db, sqlQuery.c_str(), NULL, 0, &zErrMsg);
 	if (rc != SQLITE_OK)

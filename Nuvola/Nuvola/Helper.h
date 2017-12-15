@@ -1,15 +1,27 @@
 #pragma once
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
 
 #include <vector>
 #include <string>
+#include <Ws2tcpip.h>
 #include <WinSock2.h>
 #include <winsock.h>
 #include <MSWSock.h>
+#include <iphlpapi.h>
+#include <Windns.h>
+
 
 #include "ReceivedMessage.h"
 
 #pragma comment(lib, "mswsock.lib")
+#pragma comment(lib, "iphlpapi.lib")
+#pragma comment(lib, "ws2_32.lib")
+
+#define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
 
 
 using namespace std;
@@ -23,13 +35,15 @@ public:
 	static string getStringPartFromSocket(SOCKET sc, int bytesNum);
 	static void sendData(SOCKET sc, std::string message);
 	static string getPaddedNumber(int num, int digits);
-	static int TransmitFileFunction(SOCKET sc, HANDLE hFile, DWORD dwFlags, DWORD nNumberOfBytesToWrite = 0,
-		DWORD nNumberOfBytesPerSend = 65536, LPOVERLAPPED lpOverlapped = NULL, LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers = NULL);
-	static void receiveFile(ReceivedMessage* msg);
+	static std::vector<std::string> split(const std::string &text, char sep);
+
+	static void getUsersOnNetwork();
 
 private:
-	static char* Helper::getPartFromSocket(SOCKET sc, int bytesNum);
-
+	static char* getPartFromSocket(SOCKET sc, int bytesNum);
+	static std::vector<std::pair<std::string, std::string>> getLocalIpAddress();
+	static std::vector<std::string> getFirstIpsOnSubnet(string srcIpString, string subnetMask);
+	static void getIpAddrsFromFile(string fileName);
 };
 
 

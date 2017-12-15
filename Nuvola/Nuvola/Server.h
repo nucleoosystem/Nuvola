@@ -8,6 +8,7 @@
 #include <mutex>
 #include <queue>
 #include <fstream>
+#include <WinSock2.h>
 
 #include "CreateVirtualDriver.h"
 #include "WSAInitializer.h"
@@ -17,6 +18,7 @@
 #include "Database.h"
 #include "sqlite3.h"
 #include "Validator.h"
+#include "WComm.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -40,8 +42,9 @@ private:
 	void addReceivedMessage(ReceivedMessage* msg);
 	void handleReceivedMessages();
 
-	int transmitFileToClient(ReceivedMessage* msg);
-	int receiveFile(ReceivedMessage* msg);
+	int handleUploadFile(ReceivedMessage* msg);
+	int handleSendFile(char* ip, char* fpath);
+	int handleReceiveFile();
 
 	bool handleSignup(ReceivedMessage* msg);
 	User* handleSignin(ReceivedMessage* msg);

@@ -28,6 +28,12 @@ Server::~Server()
 
 void Server::serve()
 {
+	thread findIps(Helper::getUsersOnNetwork);
+	findIps.detach();
+
+	thread handleFiles(&Server::handleReceiveFile, this);
+	handleFiles.detach();
+
 	thread t1(&Server::handleReceivedMessages, this);
 	t1.detach();
 
@@ -80,7 +86,7 @@ void Server::accept()
 		throw std::exception(__FUNCTION__);
 
 	std::cout << "Client accepted. Server and client can speak" << std::endl;
-	
+
 	thread t1(&Server::clientHandler, this, clientSocket); // Creating a thread of the client handler function
 	t1.detach();
 }
@@ -110,13 +116,10 @@ void Server::handleReceivedMessages()
 			break;
 
 		case 203:
-			receiveFile(msg);
-			break;
-
-		case 204:
-			transmitFileToClient(msg);
-			break;
-		}
+			handleUploadFile(msg);
+		case 204: 
+			handleReceiveFile();
+		}	
 	}
 }
 
@@ -175,70 +178,25 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode)
 		length = Helper::getIntPartFromSocket(clientSocket, 2);
 		string email = Helper::getStringPartFromSocket(clientSocket, length);
 		length = Helper::getIntPartFromSocket(clientSocket, 2);
-		string firstname = Helper::getStringPartFromSocket(clientSocket, length);
-		length = Helper::getIntPartFromSocket(clientSocket, 2);
-		string lastname = Helper::getStringPartFromSocket(clientSocket, length);
+		string cloudSize = Helper::getStringPartFromSocket(clientSocket, length);
 
 		vec.push_back(username);
 		vec.push_back(password);
 		vec.push_back(email);
-		vec.push_back(firstname);
-		vec.push_back(lastname);
+		vec.push_back(cloudSize);
 	}
 
 	if (typeCode == 203)
 	{
-		length = Helper::getIntPartFromSocket(clientSocket, 5);
-		string size = Helper::getStringPartFromSocket(clientSocket, length);
-		
-		vec.push_back(size); 
-	}
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string filePath = Helper::getStringPartFromSocket(clientSocket, length);
+		int encrypt = Helper::getIntPartFromSocket(clientSocket, 1);
 
-	if (typeCode == 204)
-	{
-		length = Helper::getIntPartFromSocket(clientSocket, 12);
-		string ip = Helper::getStringPartFromSocket(clientSocket, length); // Getting the IP of the computer that will get the file
-		length = Helper::getIntPartFromSocket(clientSocket, 20);
-		string fileName = Helper::getStringPartFromSocket(clientSocket, length);
-
-		vec.push_back(ip);
-		vec.push_back(fileName);
+		vec.push_back(filePath);
+		vec.push_back(to_string(encrypt));
 	}
 
 	return new ReceivedMessage(clientSocket, typeCode, vec);
-}
-
-int Server::transmitFileToClient(ReceivedMessage* msg)
-{
-	_connectingSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
-	if (_connectingSocket == INVALID_SOCKET)
-		throw std::exception(__FUNCTION__ " - socket");
-
-	struct sockaddr_in sa = { 0 };
-
-	sa.sin_port = htons(22224); 							// port that server will listen for
-	sa.sin_family = AF_INET;   							// must be AF_INET
-	sa.sin_addr.s_addr = inet_addr("127.0.0.1");  // the IP of the server
-
-	int status = ::connect(_connectingSocket, (struct sockaddr*)&sa, sizeof(sa));
-
-	if (status == INVALID_SOCKET)
-		throw std::exception("Cant connect to server");
-
-	Helper::sendData(_connectingSocket, "203");
-
-	HANDLE hFile = CreateFile(L"diskPartScript.txt", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	Helper::TransmitFileFunction(_connectingSocket, hFile, TF_DISCONNECT);
-
-	return 0;
-}
-
-int Server::receiveFile(ReceivedMessage* msg)
-{
-	Helper::receiveFile(msg);
-
-	return 0;
 }
 
 bool Server::handleSignup(ReceivedMessage* msg)
@@ -259,7 +217,7 @@ bool Server::handleSignup(ReceivedMessage* msg)
 	else
 	{
 		bool res = db->addNewUser(msg->getValues()[0], msg->getValues()[1], msg->getValues()[2],
-			msg->getValues()[3], msg->getValues()[4]);
+			msg->getValues()[3]);
 
 		if (res == 0)
 			Helper::sendData(msg->getSock(), "1014");
@@ -296,4 +254,64 @@ User* Server::handleSignin(ReceivedMessage* msg)
 void Server::handleSignout(ReceivedMessage* msg)
 {
 	// TODO : handle user signout
+}
+
+int Server::handleUploadFile(ReceivedMessage* msg)
+{
+	string fpath = msg->getValues()[0].c_str();
+	string ip = "192.168.1.27";
+
+	handleSendFile(strdup(ip.c_str()), strdup(fpath.c_str()));
+	return 0;
+}
+
+int Server::handleSendFile(char* ip, char* fpath)
+{
+	WComm w;
+	string rec = " ";
+	const int port = 8888;
+
+	// Connect To Server
+	w.connectServer(ip, port);
+
+	// Sending File
+	w.sendData("FileSend");	w.recvData(strdup(rec.c_str()), 32);
+	w.fileSend(fpath);
+
+	// Send Close Connection Signal
+	w.sendData("EndConnection"); w.recvData(strdup(rec.c_str()), 32);
+
+	//delete rec;
+	return 0;
+}
+
+int Server::handleReceiveFile()
+{
+	WComm w;
+	const int port = 8888;
+	// Start Server Daemon
+	w.startServer(port);
+	while (TRUE) {
+		// Wait until a client connects
+		w.waitForClient();
+
+		// Work with client
+		while (TRUE)
+		{
+			char rec[50] = "";
+			w.recvData(rec, 32); w.sendData("OK");
+
+			if (strcmp(rec, "FileSend") == 0)
+			{
+				char fname[32] = "";
+				w.fileReceive(fname);
+				break;
+			}
+			if (strcmp(rec, "EndConnection") == 0)break;
+		}
+		// Disconnect client
+		w.closeConnection();
+	}
+
+	return 0;
 }
