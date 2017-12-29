@@ -80,32 +80,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CreateVirtualDriver.cpp" />
-    <ClCompile Include="Database.cpp" />
-    <ClCompile Include="Helper.cpp" />
-    <ClCompile Include="ReceivedMessage.cpp" />
-    <ClCompile Include="Server.cpp" />
-    <ClCompile Include="Source.cpp" />
-    <ClCompile Include="sqlite3.c" />
-    <ClCompile Include="User.cpp" />
-    <ClCompile Include="Validator.cpp" />
-    <ClCompile Include="WComm.cpp" />
-    <ClCompile Include="WSAInitializer.cpp" />
+    <ClCompile Include="DB\Database.cpp" />
+    <ClCompile Include="DB\sqlite3.c" />
+    <ClCompile Include="Logic\CreateVirtualDriver.cpp" />
+    <ClCompile Include="Logic\Helper.cpp" />
+    <ClCompile Include="Logic\ReceivedMessage.cpp" />
+    <ClCompile Include="Logic\Server.cpp" />
+    <ClCompile Include="Logic\Source.cpp" />
+    <ClCompile Include="Logic\User.cpp" />
+    <ClCompile Include="Logic\Validator.cpp" />
+    <ClCompile Include="Networking\WComm.cpp" />
+    <ClCompile Include="Networking\WSAInitializer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CreateVirtualDriver.h" />
-    <ClInclude Include="Database.h" />
-    <ClInclude Include="Helper.h" />
-    <ClInclude Include="ReceivedMessage.h" />
-    <ClInclude Include="Server.h" />
-    <ClInclude Include="sqlite3.h" />
-    <ClInclude Include="User.h" />
-    <ClInclude Include="Validator.h" />
-    <ClInclude Include="WComm.h" />
-    <ClInclude Include="WSAInitializer.h" />
+    <ClInclude Include="DB\Database.h" />
+    <ClInclude Include="DB\sqlite3.h" />
+    <ClInclude Include="Logic\CreateVirtualDriver.h" />
+    <ClInclude Include="Logic\Helper.h" />
+    <ClInclude Include="Logic\ReceivedMessage.h" />
+    <ClInclude Include="Logic\Server.h" />
+    <ClInclude Include="Logic\User.h" />
+    <ClInclude Include="Logic\Validator.h" />
+    <ClInclude Include="Networking\WComm.h" />
+    <ClInclude Include="Networking\WSAInitializer.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="diskPartScript.txt" />
+    <Text Include="Logic\diskPartScript.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

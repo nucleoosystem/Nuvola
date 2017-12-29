@@ -13,77 +13,101 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\DB">
+      <UniqueIdentifier>{9355eff9-e27d-436b-99f8-cf3a8d094bdf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DB">
+      <UniqueIdentifier>{86483e66-42eb-4740-8bfc-de6e8ed704a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Networking">
+      <UniqueIdentifier>{55c5426f-ac23-475b-b022-6de2de70ee6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Networking">
+      <UniqueIdentifier>{8544aff6-a8a9-4de5-8c15-50ff2b0452d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Logic">
+      <UniqueIdentifier>{6eb61cf3-2576-4bdb-abea-50e17cb45bb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logic">
+      <UniqueIdentifier>{c548185d-962c-4c5c-ab38-de29edc12849}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Security">
+      <UniqueIdentifier>{5bfd213d-f90d-400e-b0a2-1d955598acc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Security">
+      <UniqueIdentifier>{5c4b2500-474a-4576-a011-0bab41df549a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="DB\sqlite3.c">
+      <Filter>Source Files\DB</Filter>
     </ClCompile>
-    <ClCompile Include="CreateVirtualDriver.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="DB\Database.cpp">
+      <Filter>Source Files\DB</Filter>
     </ClCompile>
-    <ClCompile Include="Server.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Networking\WComm.cpp">
+      <Filter>Source Files\Networking</Filter>
     </ClCompile>
-    <ClCompile Include="WSAInitializer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Networking\WSAInitializer.cpp">
+      <Filter>Source Files\Networking</Filter>
     </ClCompile>
-    <ClCompile Include="ReceivedMessage.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Logic\CreateVirtualDriver.cpp">
+      <Filter>Source Files\Logic</Filter>
     </ClCompile>
-    <ClCompile Include="Helper.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Logic\Helper.cpp">
+      <Filter>Source Files\Logic</Filter>
     </ClCompile>
-    <ClCompile Include="User.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Logic\ReceivedMessage.cpp">
+      <Filter>Source Files\Logic</Filter>
     </ClCompile>
-    <ClCompile Include="Database.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Logic\Server.cpp">
+      <Filter>Source Files\Logic</Filter>
     </ClCompile>
-    <ClCompile Include="sqlite3.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Logic\Source.cpp">
+      <Filter>Source Files\Logic</Filter>
     </ClCompile>
-    <ClCompile Include="Validator.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Logic\User.cpp">
+      <Filter>Source Files\Logic</Filter>
     </ClCompile>
-    <ClCompile Include="WComm.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Logic\Validator.cpp">
+      <Filter>Source Files\Logic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CreateVirtualDriver.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="DB\Database.h">
+      <Filter>Header Files\DB</Filter>
     </ClInclude>
-    <ClInclude Include="Server.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="DB\sqlite3.h">
+      <Filter>Header Files\DB</Filter>
     </ClInclude>
-    <ClInclude Include="WSAInitializer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Networking\WComm.h">
+      <Filter>Header Files\Networking</Filter>
     </ClInclude>
-    <ClInclude Include="ReceivedMessage.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Networking\WSAInitializer.h">
+      <Filter>Header Files\Networking</Filter>
     </ClInclude>
-    <ClInclude Include="Helper.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Logic\CreateVirtualDriver.h">
+      <Filter>Header Files\Logic</Filter>
     </ClInclude>
-    <ClInclude Include="User.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Logic\Helper.h">
+      <Filter>Header Files\Logic</Filter>
     </ClInclude>
-    <ClInclude Include="Database.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Logic\ReceivedMessage.h">
+      <Filter>Header Files\Logic</Filter>
     </ClInclude>
-    <ClInclude Include="sqlite3.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Logic\Server.h">
+      <Filter>Header Files\Logic</Filter>
     </ClInclude>
-    <ClInclude Include="Validator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Logic\User.h">
+      <Filter>Header Files\Logic</Filter>
     </ClInclude>
-    <ClInclude Include="WComm.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Logic\Validator.h">
+      <Filter>Header Files\Logic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="diskPartScript.txt">
-      <Filter>Header Files</Filter>
+    <Text Include="Logic\diskPartScript.txt">
+      <Filter>Header Files\Logic</Filter>
     </Text>
   </ItemGroup>
 </Project>
