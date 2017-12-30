@@ -72,6 +72,9 @@
     <ClCompile Include="Logic\Validator.cpp">
       <Filter>Source Files\Logic</Filter>
     </ClCompile>
+    <ClCompile Include="Networking\LocalNetFunctions.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DB\Database.h">
@@ -103,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="Logic\Validator.h">
       <Filter>Header Files\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\LocalNetFunctions.h">
+      <Filter>Header Files\Networking</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

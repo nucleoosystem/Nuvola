@@ -28,7 +28,7 @@ Server::~Server()
 
 void Server::serve()
 {
-	thread findIps(Helper::getUsersOnNetwork);
+	thread findIps(LocalNetFunctions::getUsersOnNetwork);
 	findIps.detach();
 
 	thread handleFiles(&Server::handleReceiveFile, this);

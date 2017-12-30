@@ -1,16 +1,16 @@
-﻿Build started 29/12/2017 21:07:33.
+﻿Build started 30/12/2017 11:06:59.
      1>Project "C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Nuvola\Nuvola.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Logic\Helper.cpp
-         Helper.cpp
-     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\helper.cpp(197): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Networking\LocalNetFunctions.cpp
+         LocalNetFunctions.cpp
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\networking\localnetfunctions.cpp(88): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 12.0\vc\include\stdlib.h(528) : see declaration of 'mbstowcs'
-     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\helper.cpp(214): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\helper.cpp(246): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\networking\localnetfunctions.cpp(105): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\networking\localnetfunctions.cpp(137): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 12.0\vc\include\string.h(195) : see declaration of 'strncpy'
-     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\helper.cpp(248): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\networking\localnetfunctions.cpp(139): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 12.0\vc\include\string.h(195) : see declaration of 'strncpy'
-     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\helper.cpp(282): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\networking\localnetfunctions.cpp(174): warning C4018: '<' : signed/unsigned mismatch
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Debug\Nuvola.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='requireAdministrator' uiAccess='false'" /manifest:embed /manifestinput:Nuvola.exe.manifest /DEBUG /PDB:"C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Debug\Nuvola.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Debug\Nuvola.lib" /MACHINE:X86 Debug\Database.obj
          Debug\sqlite3.obj
@@ -21,6 +21,7 @@
          Debug\Source.obj
          Debug\User.obj
          Debug\Validator.obj
+         Debug\LocalNetFunctions.obj
          Debug\WComm.obj
          Debug\WSAInitializer.obj
          Nuvola.vcxproj -> C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Debug\Nuvola.exe
@@ -28,4 +29,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.60
+Time Elapsed 00:00:01.86

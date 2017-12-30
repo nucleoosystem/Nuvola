@@ -15,6 +15,7 @@
 #include "ReceivedMessage.h"
 #include "Helper.h"
 #include "User.h"
+#include "../Networking/LocalNetFunctions.h"
 #include "../DB\Database.h"
 #include "../DB\sqlite3.h"
 #include "Validator.h"

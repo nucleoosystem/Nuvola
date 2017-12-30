@@ -14,6 +14,9 @@
 #include <Windns.h>
 #include <bitset>
 #include <algorithm>
+#include <fstream>
+#include <iomanip>
+#include <sstream>
 
 #include "ReceivedMessage.h"
 
@@ -23,7 +26,6 @@
 
 #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
-
 
 using namespace std;
 
@@ -38,14 +40,8 @@ public:
 	static string getPaddedNumber(int num, int digits);
 	static std::vector<std::string> split(const std::string &text, char sep);
 
-	static void getUsersOnNetwork();
-
 private:
 	static char* getPartFromSocket(SOCKET sc, int bytesNum);
-
-	static std::vector<std::pair<std::string, std::string>> getLocalIpAddress();
-	static void getIpAddrsFromFile(string fileName);
-	static string getBitsInSubnet(string subnet);
 };
 
 
