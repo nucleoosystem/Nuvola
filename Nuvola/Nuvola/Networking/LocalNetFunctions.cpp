@@ -3,8 +3,8 @@
 const char* arpExe64Bit = "Logic\\arp-scan-64.exe";
 const char* arpExe32Bit = "Logic\\arp-scan-86.exe";
 const char* targetIpFileName = "..//..//NuvolaWindowsForms//NuvolaWindowsForms//bin//Debug//IP.txt";
-const char* batFileName = "GetLocalIps.bat";
-const char* foundIpsFileName = "foundIps.txt";
+const char* batFileName = "Networking\\GetLocalIps.bat";
+const char* foundIpsFileName = "Networking\\foundIps.txt";
 
 // Returns the local ip address and the ip mask of the computer
 std::vector<std::pair<std::string, std::string>> LocalNetFunctions::getLocalIpAddress()
@@ -157,7 +157,7 @@ void LocalNetFunctions::getUsersOnNetwork()
 	si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
 	si.wShowWindow = SW_HIDE;
 
-	LPCTSTR lpApplicationName = L"GetLocalIps.bat";
+	LPCTSTR lpApplicationName = L"Networking\\GetLocalIps.bat";
 	DWORD creationFlags = CREATE_NO_WINDOW;
 
 	CreateProcess(lpApplicationName, NULL, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi);
