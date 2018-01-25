@@ -2,7 +2,7 @@
 
 const char* arpExe64Bit = "Logic\\arp-scan-64.exe";
 const char* arpExe32Bit = "Logic\\arp-scan-86.exe";
-const char* targetIpFileName = "..//..//NuvolaWindowsForms//NuvolaWindowsForms//bin//Debug//IP.txt";
+const char* targetIpFileName = "..//..//NuvolaWPF//NuvolaWPF//bin//Debug//IP.txt";
 const char* batFileName = "Networking\\GetLocalIps.bat";
 const char* foundIpsFileName = "Networking\\foundIps.txt";
 
@@ -100,16 +100,31 @@ void LocalNetFunctions::getIpAddrsFromFile(string fileName)
 	fstream guiIpsFile;
 	guiIpsFile.open(targetIpFileName, fstream::out | fstream::trunc);
 
+	vector<future<bool>> ipsAndResults;
 	if (guiIpsFile.is_open())
 	{
-		for (int i = 0; i < foundIps.size(); i++)
+		for (auto&& ip : foundIps)
 		{
-			guiIpsFile << foundIps[i];
-			guiIpsFile << '\n';
+			ipsAndResults.emplace_back(std::async(std::launch::async, isUserOnComputer, ip));
+		}	
+
+		for (int i = 0; i < ipsAndResults.size(); i++)
+		{
+			if (split(foundIps[i], '.')[0].compare("192") == 0 || split(foundIps[i], '.')[0].compare("10") == 0)
+			{
+				if (ipsAndResults[i].get()) // If active
+				{
+					vector<string> values = getUserInfo(foundIps[i]);
+					guiIpsFile << foundIps[i] << " 1 " << values[0] << " " << values[1] << " " << values[2] << endl;
+
+					Database* db = new Database();
+					db->insertNetworkUser(values[0], values[1], values[2]);
+				}
+			}
 		}
 	}
 	guiIpsFile.close();
-
+	cout << "\nFinished writing to file" << endl;
 }
 
 void LocalNetFunctions::getUsersOnNetwork()
@@ -122,7 +137,7 @@ void LocalNetFunctions::getUsersOnNetwork()
 
 	ofstream batFile;
 	batFile.open(batFileName, ios::trunc);
-	batFile << "@echo off	\n";
+	//batFile << "@echo off\n";
 	batFile << "netsh interface ip delete arpcache\n";
 
 	std::vector<pair<string, string>> ipAndSubnet; /* Gets the ip and the subnet of the local computer */
@@ -145,7 +160,7 @@ void LocalNetFunctions::getUsersOnNetwork()
 	batFile << "arp -a > ";
 	batFile << foundIpsFileName;
 	batFile.close();
-
+	cout << "starting" << endl;
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&si, sizeof(si));
@@ -163,7 +178,7 @@ void LocalNetFunctions::getUsersOnNetwork()
 	CreateProcess(lpApplicationName, NULL, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi);
 	WaitForSingleObject(pi.hProcess, INFINITE);
 
-	cout << "Finished" << endl;
+	cout << "Finished finding" << endl;
 	getIpAddrsFromFile(foundIpsFileName);
 }
 
@@ -179,4 +194,140 @@ string LocalNetFunctions::getBitsInSubnet(string subnet)
 	}
 
 	return to_string(totalSum);
+}
+
+bool LocalNetFunctions::isUserOnComputer(const string& ip)
+{
+	SOCKADDR_IN target; 
+	SOCKET clientSocket;
+
+	target.sin_family = AF_INET; // address family Internet
+	target.sin_port = htons(22223); //Port to connect on
+	target.sin_addr.s_addr = inet_addr(ip.c_str()); //Target IP
+
+	clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //Create socket
+	if (clientSocket == INVALID_SOCKET)
+	{
+		return false;
+	}
+
+	//Try connecting...
+
+	if (connect(clientSocket, (SOCKADDR *)&target, sizeof(target)) == SOCKET_ERROR)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+vector<string> LocalNetFunctions::getUserInfo(const string& ip)
+{
+	vector<string> values;
+	SOCKADDR_IN target;
+	SOCKET clientSocket;
+
+	target.sin_family = AF_INET; // address family Internet
+	target.sin_port = htons(22223); //Port to connect on
+	target.sin_addr.s_addr = inet_addr(ip.c_str()); //Target IP
+
+	clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //Create socket
+	if (clientSocket == INVALID_SOCKET)
+	{
+		return values;
+	}
+
+	//Try connecting...
+	if (connect(clientSocket, (SOCKADDR *)&target, sizeof(target)) == SOCKET_ERROR)
+	{
+		return values;
+	}
+	else
+	{
+		Helper::sendData(clientSocket, to_string(Protocol::GET_USER_INFO_REQUEST));
+		Helper::getMessageTypeCode(clientSocket);
+		int length = Helper::getIntPartFromSocket(clientSocket, 2);
+		values.push_back(Helper::getStringPartFromSocket(clientSocket, length));
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		values.push_back(Helper::getStringPartFromSocket(clientSocket, length));
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		values.push_back(Helper::getStringPartFromSocket(clientSocket, length));
+
+		return values;
+	}
+
+	return values;
+}
+
+int LocalNetFunctions::uploadFileToGroup(string filePath, int encrypt, vector<string> ips)
+{
+	vector<pair<string, int>> ipsAndSizes;
+
+	for (auto ip : ips)
+		ipsAndSizes.push_back(pair<string, int>(ip, atoi(getUserInfo(ip)[2].c_str())));
+
+	std::sort(ipsAndSizes.begin(), ipsAndSizes.end(), [](pair<string, int> &left, pair<string, int> &right) {
+		return left.second > right.second;
+	});
+
+	sendFileToIp(strdup(ipsAndSizes[0].first.c_str()), strdup(filePath.c_str()));
+	return 0;
+}
+
+int LocalNetFunctions::sendFileToIp(char* ip, char* path)
+{
+	WComm w;
+	string rec = " ";
+	const int port = 8888;
+
+	// Connect To Server
+	w.connectServer(ip, port);
+
+	// Sending File
+	w.sendData("FileSend");	w.recvData(strdup(rec.c_str()), 32);
+	w.fileSend(path);
+
+	// Send Close Connection Signal
+	w.sendData("EndConnection"); w.recvData(strdup(rec.c_str()), 32);
+
+	//delete rec;
+	return 0;
+}
+
+string LocalNetFunctions::encryptFile(const string& path)
+{
+	return nullptr;
+}
+
+int LocalNetFunctions::receiveFile()
+{
+	WComm w;
+	const int port = 8888;
+	// Start Server Daemon
+	w.startServer(port);
+	while (TRUE) {
+		// Wait until a client connects
+		w.waitForClient();
+
+		// Work with client
+		while (TRUE)
+		{
+			char rec[50] = "";
+			w.recvData(rec, 32); w.sendData("OK");
+
+			if (strcmp(rec, "FileSend") == 0)
+			{
+				char fname[32] = "";
+				w.fileReceive(fname);
+				break;
+			}
+			if (strcmp(rec, "EndConnection") == 0)break;
+		}
+		// Disconnect client
+		w.closeConnection();
+	}
+
+	return 0;
 }

@@ -19,6 +19,13 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <thread>
+#include <future>
+
+#include "../Logic/Helper.h"
+#include "../DB/Database.h"
+#include "Protocols.h"
+#include "WComm.h"
 
 #pragma comment(lib, "mswsock.lib")
 #pragma comment(lib, "iphlpapi.lib")
@@ -33,10 +40,17 @@ class LocalNetFunctions
 {
 public:
 	static void getUsersOnNetwork();
+	static int uploadFileToGroup(string filePath, int encrypt, vector<string> ips);
+	static int receiveFile();
+	static int sendFileToIp(char* ip, char* path);
 
 private:
 	static std::vector<std::pair<std::string, std::string>> getLocalIpAddress();
 	static void getIpAddrsFromFile(string fileName);
 	static string getBitsInSubnet(string subnet);
 	static std::vector<std::string> split(const std::string &text, char sep);
+	static bool isUserOnComputer(const string& ip);
+	static vector<string> getUserInfo(const string& ip);
+
+	static string encryptFile(const string& path);
 };

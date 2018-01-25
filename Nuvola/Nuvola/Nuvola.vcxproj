@@ -83,6 +83,7 @@
     <ClCompile Include="DB\Database.cpp" />
     <ClCompile Include="DB\sqlite3.c" />
     <ClCompile Include="Logic\CreateVirtualDriver.cpp" />
+    <ClCompile Include="Logic\Group.cpp" />
     <ClCompile Include="Logic\Helper.cpp" />
     <ClCompile Include="Logic\ReceivedMessage.cpp" />
     <ClCompile Include="Logic\Server.cpp" />
@@ -97,12 +98,14 @@
     <ClInclude Include="DB\Database.h" />
     <ClInclude Include="DB\sqlite3.h" />
     <ClInclude Include="Logic\CreateVirtualDriver.h" />
+    <ClInclude Include="Logic\Group.h" />
     <ClInclude Include="Logic\Helper.h" />
     <ClInclude Include="Logic\ReceivedMessage.h" />
     <ClInclude Include="Logic\Server.h" />
     <ClInclude Include="Logic\User.h" />
     <ClInclude Include="Logic\Validator.h" />
     <ClInclude Include="Networking\LocalNetFunctions.h" />
+    <ClInclude Include="Networking\Protocols.h" />
     <ClInclude Include="Networking\WComm.h" />
     <ClInclude Include="Networking\WSAInitializer.h" />
   </ItemGroup>

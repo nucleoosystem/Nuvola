@@ -11,17 +11,16 @@
 #include <WinSock2.h>
 
 #include "CreateVirtualDriver.h"
-#include "../Networking/WSAInitializer.h"
-#include "ReceivedMessage.h"
 #include "Helper.h"
 #include "User.h"
 #include "../Networking/LocalNetFunctions.h"
 #include "../DB\Database.h"
 #include "../DB\sqlite3.h"
 #include "Validator.h"
-#include "../Networking/WComm.h"
 
 #pragma comment(lib, "Ws2_32.lib")
+
+class ReceivedMessage;
 
 class Server
 {
@@ -44,12 +43,15 @@ private:
 	void handleReceivedMessages();
 
 	int handleUploadFile(ReceivedMessage* msg);
-	int handleSendFile(char* ip, char* fpath);
-	int handleReceiveFile();
 
 	bool handleSignup(ReceivedMessage* msg);
 	User* handleSignin(ReceivedMessage* msg);
 	void handleSignout(ReceivedMessage* msg);
+	void handleGetUserInfo(ReceivedMessage* msg);
+
+	void handleCreateNewGroup(ReceivedMessage* msg);
+	void handleAddUserToGroup(ReceivedMessage* msg);
+	void handleGetInfoAboutGroups(ReceivedMessage* msg);
 
 	mutex _mtxReceivedMessages;
 	Database* db;

@@ -75,6 +75,9 @@
     <ClCompile Include="Networking\LocalNetFunctions.cpp">
       <Filter>Source Files\Networking</Filter>
     </ClCompile>
+    <ClCompile Include="Logic\Group.cpp">
+      <Filter>Source Files\Logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DB\Database.h">
@@ -108,6 +111,12 @@
       <Filter>Header Files\Logic</Filter>
     </ClInclude>
     <ClInclude Include="Networking\LocalNetFunctions.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Logic\Group.h">
+      <Filter>Header Files\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\Protocols.h">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
   </ItemGroup>

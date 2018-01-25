@@ -24,3 +24,6 @@ void diskpartCall();
 
 /* The function changes the diskpart commands file based on the given path. */
 void editDiskpartCommands(PCWSTR path);
+
+/* The function returns the amount of free space left in the virtual hard drive */
+int getFreeSpace();

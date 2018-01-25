@@ -28,10 +28,10 @@ Server::~Server()
 
 void Server::serve()
 {
-	thread findIps(LocalNetFunctions::getUsersOnNetwork);
-	findIps.detach();
+	/*thread findIps(LocalNetFunctions::getUsersOnNetwork);
+	findIps.detach();*/
 
-	thread handleFiles(&Server::handleReceiveFile, this);
+	thread handleFiles(&LocalNetFunctions::receiveFile);
 	handleFiles.detach();
 
 	thread t1(&Server::handleReceivedMessages, this);
@@ -103,22 +103,37 @@ void Server::handleReceivedMessages()
 
 		switch (msg->getMessageCode()) // Switch based on the type code
 		{
-		case 200:
+		case Protocol::SIGN_IN_REQUEST:
 			handleSignin(msg);
 			break;
 
-		case 201:
+		case Protocol::SIGN_OUT_REQUEST:
 			handleSignout(msg);
 			break;
 
-		case 202:
+		case Protocol::SIGN_UP_REQUEST:
 			handleSignup(msg);
 			break;
 
-		case 203:
+		case Protocol::UPLOAD_FILE_REQUEST:
 			handleUploadFile(msg);
-		case 204: 
-			handleReceiveFile();
+			break;
+
+		case Protocol::GET_USER_INFO_REQUEST:
+			handleGetUserInfo(msg);
+			break;
+
+		case Protocol::CREATE_NEW_GROUP:
+			handleCreateNewGroup(msg);
+			break;
+
+		case Protocol::ADD_USER_TO_GROUP:
+			handleAddUserToGroup(msg);
+			break;
+
+		case Protocol::GET_INFO_ABOUT_GROUPS:
+			handleGetInfoAboutGroups(msg);
+			break;
 		}	
 	}
 }
@@ -158,7 +173,7 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode)
 	vector<string> vec;
 	int length = 0;
 
-	if (typeCode == 200)
+	if (typeCode == Protocol::SIGN_IN_REQUEST)
 	{
 		length = Helper::getIntPartFromSocket(clientSocket, 2);
 		string username = Helper::getStringPartFromSocket(clientSocket, length);
@@ -169,7 +184,7 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode)
 		vec.push_back(password);
 	}
 
-	else if (typeCode == 202)
+	else if (typeCode == Protocol::SIGN_UP_REQUEST)
 	{
 		length = Helper::getIntPartFromSocket(clientSocket, 2);
 		string username = Helper::getStringPartFromSocket(clientSocket, length);
@@ -186,14 +201,44 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode)
 		vec.push_back(cloudSize);
 	}
 
-	if (typeCode == 203)
+	else if (typeCode == Protocol::UPLOAD_FILE_REQUEST)
 	{
 		length = Helper::getIntPartFromSocket(clientSocket, 2);
 		string filePath = Helper::getStringPartFromSocket(clientSocket, length);
 		int encrypt = Helper::getIntPartFromSocket(clientSocket, 1);
-
 		vec.push_back(filePath);
 		vec.push_back(to_string(encrypt));
+
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		int numberOfUsers = Helper::getIntPartFromSocket(clientSocket, length);
+		for (int i = 0; i < numberOfUsers; i++)
+		{
+			length = Helper::getIntPartFromSocket(clientSocket, 2);
+			string ip = Helper::getStringPartFromSocket(clientSocket, length);
+			vec.push_back(ip);
+		}
+	}
+
+	else if (typeCode == Protocol::CREATE_NEW_GROUP)
+	{
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string groupName = Helper::getStringPartFromSocket(clientSocket, length);
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string password = Helper::getStringPartFromSocket(clientSocket, length);
+
+		vec.push_back(groupName);
+		vec.push_back(password);
+	}
+
+	else if (typeCode == Protocol::ADD_USER_TO_GROUP)
+	{
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string username = Helper::getStringPartFromSocket(clientSocket, length);
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string ip = Helper::getStringPartFromSocket(clientSocket, length);
+
+		vec.push_back(username);
+		vec.push_back(ip);
 	}
 
 	return new ReceivedMessage(clientSocket, typeCode, vec);
@@ -204,15 +249,15 @@ bool Server::handleSignup(ReceivedMessage* msg)
 	bool res = 0;
 	if (!Validator::isUsernameValid(msg->getValues()[0]))
 	{
-		Helper::sendData(msg->getSock(), "1013");
+		Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_UP_USERNAME_ILLEGAL));
 	}
 	else if (!Validator::isPasswordValid(msg->getValues()[1]))
 	{
-		Helper::sendData(msg->getSock(), "1011");
+		Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_UP_PASS_ILLEGAL));
 	}
 	else if (db->doesUserExists(msg->getValues()[0]))
 	{
-		Helper::sendData(msg->getSock(), "1012");
+		Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_UP_USERNAME_EXISTS));
 	}
 	else
 	{
@@ -220,9 +265,9 @@ bool Server::handleSignup(ReceivedMessage* msg)
 			msg->getValues()[3]);
 
 		if (res == 0)
-			Helper::sendData(msg->getSock(), "1014");
+			Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_UP_OTHER_ERROR));
 		else
-			Helper::sendData(msg->getSock(), "1010");
+			Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_UP_SUCCESS));
 	}
 
 	return res;
@@ -234,19 +279,19 @@ User* Server::handleSignin(ReceivedMessage* msg)
 	{
 		if (!db->isUserAndPassMatch(msg->getValues()[0], msg->getValues()[1])) // Checks if the user has the given password
 		{
-			Helper::sendData(msg->getSock(), "1001");
+			Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_IN_WRONG_DETAILS));
 			return nullptr;
 		}
 		else
 		{
-			Helper::sendData(msg->getSock(), "1000");
+			Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_IN_SUCCESS));
 		}
 
 		return new User(msg->getValues()[0], msg->getSock());
 	}
 	else
 	{
-		Helper::sendData(msg->getSock(), "1003");
+		Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_IN_DETAILS_NOT_VALID));
 		return nullptr;
 	}
 }
@@ -258,60 +303,57 @@ void Server::handleSignout(ReceivedMessage* msg)
 
 int Server::handleUploadFile(ReceivedMessage* msg)
 {
-	string fpath = msg->getValues()[0].c_str();
-	string ip = "192.168.1.27";
+	string filePath = msg->getValues()[0];
+	int encrypt = atoi(msg->getValues()[1].c_str());
+	vector<string> ips;
 
-	handleSendFile(strdup(ip.c_str()), strdup(fpath.c_str()));
-	return 0;
-}
+	for (int i = 2; i < msg->getValues().size(); i++)
+		ips.push_back(msg->getValues()[i]);
 
-int Server::handleSendFile(char* ip, char* fpath)
-{
-	WComm w;
-	string rec = " ";
-	const int port = 8888;
-
-	// Connect To Server
-	w.connectServer(ip, port);
-
-	// Sending File
-	w.sendData("FileSend");	w.recvData(strdup(rec.c_str()), 32);
-	w.fileSend(fpath);
-
-	// Send Close Connection Signal
-	w.sendData("EndConnection"); w.recvData(strdup(rec.c_str()), 32);
-
-	//delete rec;
-	return 0;
-}
-
-int Server::handleReceiveFile()
-{
-	WComm w;
-	const int port = 8888;
-	// Start Server Daemon
-	w.startServer(port);
-	while (TRUE) {
-		// Wait until a client connects
-		w.waitForClient();
-
-		// Work with client
-		while (TRUE)
-		{
-			char rec[50] = "";
-			w.recvData(rec, 32); w.sendData("OK");
-
-			if (strcmp(rec, "FileSend") == 0)
-			{
-				char fname[32] = "";
-				w.fileReceive(fname);
-				break;
-			}
-			if (strcmp(rec, "EndConnection") == 0)break;
-		}
-		// Disconnect client
-		w.closeConnection();
+	if (ips.size() == 1)
+	{
+		LocalNetFunctions::sendFileToIp(strdup(ips.at(0).c_str()), strdup(filePath.c_str()));
+	}
+	else
+	{
+		LocalNetFunctions::uploadFileToGroup(filePath, encrypt, ips);
 	}
 
 	return 0;
+}
+
+void Server::handleGetUserInfo(ReceivedMessage* msg)
+{
+	vector<string> values = db->getCurrentUserInfo();
+	string sendString = "102" + Helper::getPaddedNumber(values[0].length(), 2) + values[0];
+	sendString += Helper::getPaddedNumber(values[2].length(), 2) + values[2];
+	sendString += Helper::getPaddedNumber(values[1].length(), 2) + values[1];
+
+	Helper::sendData(msg->getSock(), sendString);
+}
+
+void Server::handleCreateNewGroup(ReceivedMessage* msg)
+{
+	db->insertNewGroup(msg->getValues()[0], msg->getValues()[1]);
+}
+
+void Server::handleAddUserToGroup(ReceivedMessage* msg)
+{
+
+}
+
+void Server::handleGetInfoAboutGroups(ReceivedMessage* msg)
+{
+	vector<pair<string,string>> values = db->getInfoAboutGroups();
+	string sendString = "103" + Helper::getPaddedNumber(to_string(values.size()).length(), 2) + to_string(values.size());
+
+	for (int i = 0; i < values.size(); i++)
+	{
+		sendString += Helper::getPaddedNumber(values[i].first.length(), 2);
+		sendString += values[i].first;
+		sendString += Helper::getPaddedNumber(values[i].second.length(), 2);
+		sendString += values[i].second;
+	}
+
+	Helper::sendData(msg->getSock(), sendString);
 }
