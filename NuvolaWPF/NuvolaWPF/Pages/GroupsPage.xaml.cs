@@ -21,6 +21,7 @@ namespace NuvolaWPF.Pages
     /// </summary>
     public partial class GroupsPage : UserControl
     {
+        static bool isClosing = false;
         public Dictionary<string, List<string>> groups = new Dictionary<string, List<string>>();
 
         public GroupsPage()
@@ -72,12 +73,71 @@ namespace NuvolaWPF.Pages
             {
                 groupNameLbl.Content = item.Content;
                 usersLbl.Content = groups[item.Content.ToString()][0];
+                usersCombo.Items.Clear();
+
+                try
+                {
+                    SocketHandler sh = new SocketHandler();
+                    sh.sendData("210");
+
+                    sh.getMsgCode();
+                    int amount = int.Parse(sh.recvDataWithSize());
+                    for(int i = 0; i < amount; i++)
+                    {
+                        string username = sh.recvDataWithSize();
+                        usersCombo.Items.Add(username);
+                    }
+                }
+                catch(SocketException)
+                {
+                    // TODO : Handle exception
+                }
             }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            GetInfoAboutGroups();
+            if (!isClosing)
+            {
+                GetInfoAboutGroups();
+                isClosing = true;
+            }
+            else
+            {
+                isClosing = false;
+            }
+        }
+
+        private void uploadBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string fileName = " ";
+
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            // Display OpenFileDialog by calling ShowDialog method
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Get the selected file name and display in a TextBox
+            if (result == true)
+            {
+                // Open document
+                fileName = dlg.FileName;
+            }
+
+            string data = "209";
+            data += groupNameLbl.Content.ToString().PadLeft(2, '0');
+            data += groupNameLbl.Content.ToString();
+            data += fileName.Length.ToString().PadLeft(2, '0');
+            data += fileName;
+
+            SocketHandler sh = new SocketHandler();
+            try
+            {
+                sh.sendData(data);
+            }
+            catch(SocketException)
+            {
+                // TODO : Handle Socket Exception
+            }
         }
     }
 }

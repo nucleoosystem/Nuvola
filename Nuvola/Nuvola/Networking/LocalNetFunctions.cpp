@@ -6,6 +6,8 @@ const char* targetIpFileName = "..//..//NuvolaWPF//NuvolaWPF//bin//Debug//IP.txt
 const char* batFileName = "Networking\\GetLocalIps.bat";
 const char* foundIpsFileName = "Networking\\foundIps.txt";
 
+map<string, string> LocalNetFunctions::usersToIps;
+
 // Returns the local ip address and the ip mask of the computer
 std::vector<std::pair<std::string, std::string>> LocalNetFunctions::getLocalIpAddress()
 {
@@ -115,10 +117,14 @@ void LocalNetFunctions::getIpAddrsFromFile(string fileName)
 				if (ipsAndResults[i].get()) // If active
 				{
 					vector<string> values = getUserInfo(foundIps[i]);
-					guiIpsFile << foundIps[i] << " 1 " << values[0] << " " << values[1] << " " << values[2] << endl;
+					if (values[0].compare("NULL") != 0)
+					{
+						guiIpsFile << foundIps[i] << " " << values[0] << " " << values[1] << " " << values[2] << endl;
+						usersToIps[values[0]] = foundIps[i];
 
-					Database* db = new Database();
-					db->insertNetworkUser(values[0], values[1], values[2]);
+						Database* db = new Database();
+						db->insertNetworkUser(values[0], values[1], values[2]);
+					}
 				}
 			}
 		}
@@ -127,7 +133,7 @@ void LocalNetFunctions::getIpAddrsFromFile(string fileName)
 	cout << "\nFinished writing to file" << endl;
 }
 
-void LocalNetFunctions::getUsersOnNetwork()
+void LocalNetFunctions::getUsersOnNetwork(SOCKET userSocket)
 {
 	string exeName = arpExe64Bit;
 
@@ -180,6 +186,8 @@ void LocalNetFunctions::getUsersOnNetwork()
 
 	cout << "Finished finding" << endl;
 	getIpAddrsFromFile(foundIpsFileName);
+
+	Helper::sendData(userSocket, "105");
 }
 
 string LocalNetFunctions::getBitsInSubnet(string subnet)
@@ -249,12 +257,19 @@ vector<string> LocalNetFunctions::getUserInfo(const string& ip)
 		Helper::sendData(clientSocket, to_string(Protocol::GET_USER_INFO_REQUEST));
 		Helper::getMessageTypeCode(clientSocket);
 		int length = Helper::getIntPartFromSocket(clientSocket, 2);
-		values.push_back(Helper::getStringPartFromSocket(clientSocket, length));
-		length = Helper::getIntPartFromSocket(clientSocket, 2);
-		values.push_back(Helper::getStringPartFromSocket(clientSocket, length));
-		length = Helper::getIntPartFromSocket(clientSocket, 2);
-		values.push_back(Helper::getStringPartFromSocket(clientSocket, length));
-
+		string username = Helper::getStringPartFromSocket(clientSocket, length);
+		if (username.compare("NULL") != 0)
+		{
+			values.push_back(username);
+			length = Helper::getIntPartFromSocket(clientSocket, 2);
+			values.push_back(Helper::getStringPartFromSocket(clientSocket, length));
+			length = Helper::getIntPartFromSocket(clientSocket, 2);
+			values.push_back(Helper::getStringPartFromSocket(clientSocket, length));
+		}
+		else
+		{
+			values.push_back("NULL");
+		}
 		return values;
 	}
 
@@ -330,4 +345,16 @@ int LocalNetFunctions::receiveFile()
 	}
 
 	return 0;
+}
+
+string LocalNetFunctions::usernameToIP(string username)
+{
+	if (usersToIps.find(username) != usersToIps.end())
+	{
+		return usersToIps[username];
+	}
+	else
+	{
+		return "Not Found";
+	}
 }

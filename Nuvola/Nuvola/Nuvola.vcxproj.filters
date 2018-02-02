@@ -78,6 +78,9 @@
     <ClCompile Include="Logic\Group.cpp">
       <Filter>Source Files\Logic</Filter>
     </ClCompile>
+    <ClCompile Include="Logic\HardDiskManager.cpp">
+      <Filter>Source Files\Logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DB\Database.h">
@@ -118,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="Networking\Protocols.h">
       <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Logic\HardDiskManager.h">
+      <Filter>Header Files\Logic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,6 @@
+select vdisk file = C:\Users\ShakedNissanov\Documents\drive.vhd
+attach vdisk
+create partition primary
+active
+assign letter = N
+format quick fs = ntfs label = Nuvola

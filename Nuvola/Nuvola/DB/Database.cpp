@@ -145,45 +145,6 @@ bool Database::isUserAndPassMatch(string username, string password)
 	return false;
 }
 
-vector<string> Database::getCurrentUserInfo()
-{
-	int rc;
-	sqlite3* db;
-	char *zErrMsg = 0;
-	string sqlQuery = " ";
-	vector<string> values;
-
-	rc = sqlite3_open(fileName, &db);
-	if (rc)
-	{
-		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
-		sqlite3_close(db);
-		system("Pause");
-		return values;
-	}
-
-	sqlQuery = "SELECT * FROM t_users";
-	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
-	if (rc != SQLITE_OK)
-	{
-		cout << "SQL error: " << zErrMsg << endl;
-		sqlite3_free(zErrMsg);
-		system("Pause");
-		return values;
-	}
-
-	unordered_map<string, vector<string>>::iterator it;
-
-	for (auto it = results.begin(); it != results.end(); it++)
-	{
-		if (it->second.front().compare("password"))
-			values.push_back(it->second.front());
-	}
-	results.clear();
-
-	return values;
-}
-
 void Database::insertNetworkUser(string name, string email, string cloudSize)
 {
 	int rc;
@@ -265,8 +226,8 @@ void Database::insertNewGroup(string name, string password)
 		system("Pause");
 	}
 
-	string thisUser = getCurrentUserInfo()[0];
-	string cloudSize = getCurrentUserInfo()[1];
+	string thisUser = Server::getCurrentUsername();
+	string cloudSize = Server::getDriveFreeSpace();
 
 	sqlQuery = "INSERT INTO t_groups (group_name, users, password, storage, available_storage) VALUES(\'";
 	sqlQuery += name + "\',\'";
@@ -308,6 +269,8 @@ void Database::addUserToGroup(string groupName, string username)
 	}
 
 	unordered_map<string, vector<string>>::iterator it;
+
+	results.clear();
 }
 
 vector<pair<string,string>> Database::getInfoAboutGroups()
@@ -362,6 +325,112 @@ vector<pair<string,string>> Database::getInfoAboutGroups()
 	}
 
 	return groups;
+}
+
+string Database::getUserEmail(string username)
+{
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+		return " ";
+	}
+
+	sqlQuery = "SELECT email FROM t_users WHERE username = '" + username + "'";
+	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+		return " ";
+	}
+
+	unordered_map<string, vector<string>>::iterator it = results.begin();
+
+	if (it != results.end())
+	{
+		string userEmail = it->second.at(0);
+		results.clear();
+		return userEmail;
+	}	
+
+	results.clear();
+
+	return " ";
+}
+
+void Database::deleteAllNetworkUsers()
+{
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+	}
+
+	sqlQuery = "DELETE FROM t_otherUsers";
+	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+	}
+
+	results.clear();
+}
+
+vector<string> Database::getAllNetUsersInfo()
+{
+	vector<string> users;
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+		return users;
+	}
+
+	sqlQuery = "SELECT username FROM t_otherUsers";
+	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+		return users;
+	}
+
+	unordered_map<string, vector<string>>::iterator it = results.begin();
+	if (it != results.end())
+	{
+		for (int i = 0; i < it->second.size(); i++)
+		{
+			if (std::find(users.begin(), users.end(), it->second.at(i)) == users.end())
+				users.push_back(it->second.at(i));
+		}
+	}
+
+	results.clear();
+
+	return users;
 }
 
 int Database::callback(void* notUsed, int argc, char** argv, char** azCol)

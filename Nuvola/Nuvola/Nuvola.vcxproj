@@ -84,6 +84,7 @@
     <ClCompile Include="DB\sqlite3.c" />
     <ClCompile Include="Logic\CreateVirtualDriver.cpp" />
     <ClCompile Include="Logic\Group.cpp" />
+    <ClCompile Include="Logic\HardDiskManager.cpp" />
     <ClCompile Include="Logic\Helper.cpp" />
     <ClCompile Include="Logic\ReceivedMessage.cpp" />
     <ClCompile Include="Logic\Server.cpp" />
@@ -99,6 +100,7 @@
     <ClInclude Include="DB\sqlite3.h" />
     <ClInclude Include="Logic\CreateVirtualDriver.h" />
     <ClInclude Include="Logic\Group.h" />
+    <ClInclude Include="Logic\HardDiskManager.h" />
     <ClInclude Include="Logic\Helper.h" />
     <ClInclude Include="Logic\ReceivedMessage.h" />
     <ClInclude Include="Logic\Server.h" />

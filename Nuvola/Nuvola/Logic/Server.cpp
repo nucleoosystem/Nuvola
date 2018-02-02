@@ -3,6 +3,7 @@
 
 std::condition_variable cv; // Lockes the handle message function until a message has arrived
 queue<ReceivedMessage*> _queRcvMessages;
+User* Server::currentUser = NULL;
 
 Server::Server()
 {
@@ -28,8 +29,7 @@ Server::~Server()
 
 void Server::serve()
 {
-	/*thread findIps(LocalNetFunctions::getUsersOnNetwork);
-	findIps.detach();*/
+	db->deleteAllNetworkUsers();
 
 	thread handleFiles(&LocalNetFunctions::receiveFile);
 	handleFiles.detach();
@@ -104,7 +104,7 @@ void Server::handleReceivedMessages()
 		switch (msg->getMessageCode()) // Switch based on the type code
 		{
 		case Protocol::SIGN_IN_REQUEST:
-			handleSignin(msg);
+			currentUser = handleSignin(msg);
 			break;
 
 		case Protocol::SIGN_OUT_REQUEST:
@@ -133,6 +133,18 @@ void Server::handleReceivedMessages()
 
 		case Protocol::GET_INFO_ABOUT_GROUPS:
 			handleGetInfoAboutGroups(msg);
+			break;
+
+		case Protocol::UPLOAD_FILE_TO_GROUP:
+			handleUploadFileToGroup(msg);
+			break;
+
+		case Protocol::GET_ALL_USERS:
+			handleGetAllUsersInfo(msg);
+			break;
+
+		case Protocol::GET_WORK_END:
+			handleFinishWork(msg);
 			break;
 		}	
 	}
@@ -235,10 +247,21 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode)
 		length = Helper::getIntPartFromSocket(clientSocket, 2);
 		string username = Helper::getStringPartFromSocket(clientSocket, length);
 		length = Helper::getIntPartFromSocket(clientSocket, 2);
-		string ip = Helper::getStringPartFromSocket(clientSocket, length);
+		string groupName = Helper::getStringPartFromSocket(clientSocket, length);
 
 		vec.push_back(username);
-		vec.push_back(ip);
+		vec.push_back(groupName);
+	}
+
+	else if (typeCode == Protocol::UPLOAD_FILE_TO_GROUP)
+	{
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string groupName = Helper::getStringPartFromSocket(clientSocket, length);
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string filePath = Helper::getStringPartFromSocket(clientSocket, length);
+
+		vec.push_back(groupName);
+		vec.push_back(filePath);
 	}
 
 	return new ReceivedMessage(clientSocket, typeCode, vec);
@@ -323,13 +346,24 @@ int Server::handleUploadFile(ReceivedMessage* msg)
 }
 
 void Server::handleGetUserInfo(ReceivedMessage* msg)
-{
-	vector<string> values = db->getCurrentUserInfo();
-	string sendString = "102" + Helper::getPaddedNumber(values[0].length(), 2) + values[0];
-	sendString += Helper::getPaddedNumber(values[2].length(), 2) + values[2];
-	sendString += Helper::getPaddedNumber(values[1].length(), 2) + values[1];
+{	
+	if (currentUser)
+	{
+		string sendString = "102";
+		sendString += Helper::getPaddedNumber(currentUser->getUserName().length(), 2) + currentUser->getUserName();
+		sendString += Helper::getPaddedNumber(db->getUserEmail(currentUser->getUserName()).length(), 2);
+		sendString += db->getUserEmail(currentUser->getUserName());
+		sendString += Helper::getPaddedNumber(getDriveFreeSpace().length(), 2);
+		sendString += getDriveFreeSpace();
 
-	Helper::sendData(msg->getSock(), sendString);
+		Helper::sendData(msg->getSock(), sendString);
+	}
+	else
+	{
+		string sendString = "102";
+		sendString += "04NULL";
+		Helper::sendData(msg->getSock(), sendString);
+	}
 }
 
 void Server::handleCreateNewGroup(ReceivedMessage* msg)
@@ -339,12 +373,12 @@ void Server::handleCreateNewGroup(ReceivedMessage* msg)
 
 void Server::handleAddUserToGroup(ReceivedMessage* msg)
 {
-
+	db->addUserToGroup(msg->getValues()[1], msg->getValues()[0]);
 }
 
 void Server::handleGetInfoAboutGroups(ReceivedMessage* msg)
 {
-	vector<pair<string,string>> values = db->getInfoAboutGroups();
+	vector<pair<string, string>> values = db->getInfoAboutGroups();
 	string sendString = "103" + Helper::getPaddedNumber(to_string(values.size()).length(), 2) + to_string(values.size());
 
 	for (int i = 0; i < values.size(); i++)
@@ -356,4 +390,74 @@ void Server::handleGetInfoAboutGroups(ReceivedMessage* msg)
 	}
 
 	Helper::sendData(msg->getSock(), sendString);
+}
+
+string Server::getDriveFreeSpace()
+{
+	CHardDiskManager manager;
+	manager.CheckFreeSpace(L"c:");
+
+	return to_string(manager.GetTotalNumberOfFreeGBytes());
+}
+
+string Server::getCurrentUsername()
+{
+	if (currentUser)
+	{
+		return currentUser->getUserName();
+	}
+}
+
+SOCKET Server::getCurrentSocket()
+{
+	if (currentUser)
+	{
+		return currentUser->getSocket();
+	}
+}
+
+void Server::handleUploadFileToGroup(ReceivedMessage* msg)
+{
+	vector<pair<string, string>> groups = db->getInfoAboutGroups();
+	vector<string> users;
+	vector<string> ips;
+	
+	auto it = groups.begin();
+	for (it; it != groups.end(); it++)
+	{
+		if (it->first.compare(msg->getValues()[0]) == 0)
+		{
+			users = LocalNetFunctions::split(it->second, '/');
+		}
+	}
+	
+	for (auto user : users)
+	{
+		if (LocalNetFunctions::usernameToIP(user).compare("Not Found") != 0)
+			ips.push_back(LocalNetFunctions::usernameToIP(user));
+	}
+
+	LocalNetFunctions::uploadFileToGroup(msg->getValues()[1], 0, ips);
+}
+
+void Server::handleGetAllUsersInfo(ReceivedMessage* msg)
+{
+	vector<string> users = db->getAllNetUsersInfo();
+	string data = "104";
+	data += Helper::getPaddedNumber(to_string(users.size()).length(), 2);
+	data += to_string(users.size());
+	
+	for (auto user : users)
+	{
+		data += Helper::getPaddedNumber(user.length(), 2);
+		data += user;
+	}
+
+	Helper::sendData(msg->getSock(), data);
+}
+
+void Server::handleFinishWork(ReceivedMessage* msg)
+{
+	thread findIps(&LocalNetFunctions::getUsersOnNetwork, msg->getSock());
+	findIps.detach();
 }

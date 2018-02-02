@@ -22,8 +22,12 @@ namespace Protocol
 	const int GET_FILE = 204;
 
 	const int GET_USER_INFO_REQUEST = 205;
+	const int GET_ALL_USERS = 210;
 
 	const int CREATE_NEW_GROUP = 206;
 	const int ADD_USER_TO_GROUP = 207;
 	const int GET_INFO_ABOUT_GROUPS = 208;
+	const int UPLOAD_FILE_TO_GROUP = 209;
+
+	const int GET_WORK_END = 211;
 }

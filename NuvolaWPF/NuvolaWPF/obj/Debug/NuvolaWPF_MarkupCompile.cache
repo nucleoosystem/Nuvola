@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\App.xaml
-10-629159003
+12-229232291
 
-141141280371
-15419147312
-MainWindow.xaml;Pages\DevicesPage.xaml;Pages\FilesPage.xaml;Pages\GroupsPage.xaml;Pages\Groups\CreateGroup.xaml;Pages\Settings\About.xaml;Pages\Settings\Appearance.xaml;Pages\Home.xaml;Pages\SettingsPage.xaml;Pages\UploadPage.xaml;
+161322927725
+16159612141
+MainWindow.xaml;Pages\DevicesPage.xaml;Pages\FilesPage.xaml;Pages\GroupsPage.xaml;Pages\Groups\CreateGroup.xaml;Pages\LoadingPage.xaml;Pages\Login\LoginPage.xaml;Pages\Settings\About.xaml;Pages\Settings\Appearance.xaml;Pages\Home.xaml;Pages\SettingsPage.xaml;Pages\UploadPage.xaml;
 
 False
 

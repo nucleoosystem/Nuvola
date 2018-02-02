@@ -141,8 +141,3 @@ void editDiskpartCommands(PCWSTR path)
 		}
 	}
 }
-
-int getFreeSpace()
-{
-	return 0;
-}

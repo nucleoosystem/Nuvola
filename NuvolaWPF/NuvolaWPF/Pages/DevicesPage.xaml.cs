@@ -65,9 +65,9 @@ namespace NuvolaWPF.Pages
             if (item != null)
             {
                 ipLbl.Content = item.Content;
-                usernameLbl.Content = ips[item.Content.ToString()][1];
-                emailLbl.Content = ips[item.Content.ToString()][2];
-                cloudSizeLbl.Content = ips[item.Content.ToString()][0];
+                usernameLbl.Content = ips[item.Content.ToString()][0];
+                emailLbl.Content = ips[item.Content.ToString()][1];
+                cloudSizeLbl.Content = ips[item.Content.ToString()][2];
             }
         }
 
