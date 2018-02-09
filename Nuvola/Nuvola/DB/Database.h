@@ -31,6 +31,7 @@ public:
 	void insertNewGroup(string name, string password);
 	void addUserToGroup(string groupName, string username);
 	vector<pair<string,string>>  getInfoAboutGroups();
+	void deleteUserFromGroup(string username, string groupName);
 
 	static int callback(void*, int, char**, char**);
 

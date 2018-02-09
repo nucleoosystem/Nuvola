@@ -7,6 +7,7 @@ const char* batFileName = "Networking\\GetLocalIps.bat";
 const char* foundIpsFileName = "Networking\\foundIps.txt";
 
 map<string, string> LocalNetFunctions::usersToIps;
+vector<string> allLocalAddrs;
 
 // Returns the local ip address and the ip mask of the computer
 std::vector<std::pair<std::string, std::string>> LocalNetFunctions::getLocalIpAddress()
@@ -39,14 +40,23 @@ std::vector<std::pair<std::string, std::string>> LocalNetFunctions::getLocalIpAd
 		while (pAdapter) {
 			string ipAddr(pAdapter->IpAddressList.IpAddress.String);
 			string ipMask(pAdapter->IpAddressList.IpMask.String);
+			string ipGateway(pAdapter->GatewayList.IpAddress.String);
 
-			if ((pAdapter->Type == IF_TYPE_IEEE80211 || pAdapter->Type == IF_TYPE_ETHERNET_CSMACD) && ipAddr != "0.0.0.0" && ipMask != "0.0.0.0")
+			allLocalAddrs.push_back(ipAddr);
+
+			/*if ((pAdapter->Type == IF_TYPE_IEEE80211 || pAdapter->Type == IF_TYPE_ETHERNET_CSMACD) && ipAddr != "0.0.0.0" && ipMask != "0.0.0.0")
 			{
 				if (split(ipAddr, '.')[0] == "192" || split(ipAddr, '.')[0] == "10")
 				{
 					std::pair<std::string, std::string> addrMask(ipAddr, ipMask);
 					returnArr.push_back(addrMask);
 				}
+			}*/
+
+			if (ipGateway.compare("0.0.0.0") != 0)
+			{
+				std::pair<std::string, std::string> addrMask(ipAddr, ipMask);
+				returnArr.push_back(addrMask);
 			}
 			pAdapter = pAdapter->Next;
 		}
@@ -112,7 +122,7 @@ void LocalNetFunctions::getIpAddrsFromFile(string fileName)
 
 		for (int i = 0; i < ipsAndResults.size(); i++)
 		{
-			if (split(foundIps[i], '.')[0].compare("192") == 0 || split(foundIps[i], '.')[0].compare("10") == 0)
+			if (std::find(allLocalAddrs.begin(), allLocalAddrs.end(), foundIps[i]) == allLocalAddrs.end())
 			{
 				if (ipsAndResults[i].get()) // If active
 				{
@@ -233,6 +243,7 @@ bool LocalNetFunctions::isUserOnComputer(const string& ip)
 
 vector<string> LocalNetFunctions::getUserInfo(const string& ip)
 {
+	Database* db = new Database();
 	vector<string> values;
 	SOCKADDR_IN target;
 	SOCKET clientSocket;
@@ -254,7 +265,15 @@ vector<string> LocalNetFunctions::getUserInfo(const string& ip)
 	}
 	else
 	{
-		Helper::sendData(clientSocket, to_string(Protocol::GET_USER_INFO_REQUEST));
+		string data = to_string(Protocol::GET_USER_INFO_REQUEST);
+		data += Helper::getPaddedNumber(Server::getCurrentUsername().length(), 2);
+		data += Server::getCurrentUsername();
+		data += Helper::getPaddedNumber(db->getUserEmail(Server::getCurrentUsername()).length(), 2);
+		data += db->getUserEmail(Server::getCurrentUsername());
+		data += Helper::getPaddedNumber(Server::getDriveFreeSpace().length(), 2);
+		data += Server::getDriveFreeSpace();
+
+		Helper::sendData(clientSocket, data);
 		Helper::getMessageTypeCode(clientSocket);
 		int length = Helper::getIntPartFromSocket(clientSocket, 2);
 		string username = Helper::getStringPartFromSocket(clientSocket, length);
@@ -357,4 +376,25 @@ string LocalNetFunctions::usernameToIP(string username)
 	{
 		return "Not Found";
 	}
+}
+
+void LocalNetFunctions::addUserToList(string username, string IP)
+{
+	if (usersToIps.find(username) == usersToIps.end())
+	{
+		usersToIps[username] = IP;
+	}
+}
+
+void LocalNetFunctions::writeToIpsFile(string ip, string username, string email, string cloudSize)
+{
+	fstream guiIpsFile;
+	guiIpsFile.open(targetIpFileName, std::ios::app);
+
+	if (guiIpsFile.is_open())
+	{
+		guiIpsFile << ip << " " << username << " " << email << " " << cloudSize << endl;
+	}
+
+	guiIpsFile.close();
 }

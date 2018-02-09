@@ -68,6 +68,7 @@ bool Database::doesUserExists(string name)
 	}
 
 	results.clear();
+	sqlite3_close(db);
 
 	return false;
 }
@@ -102,6 +103,7 @@ bool Database::addNewUser(string username, string password, string email, string
 		return false;
 	}
 
+	sqlite3_close(db);
 
 	return true;
 }
@@ -141,6 +143,7 @@ bool Database::isUserAndPassMatch(string username, string password)
 	}
 
 	results.clear();
+	sqlite3_close(db);
 
 	return false;
 }
@@ -172,6 +175,8 @@ void Database::insertNetworkUser(string name, string email, string cloudSize)
 		sqlite3_free(zErrMsg);
 		system("Pause");
 	}
+
+	sqlite3_close(db);
 }
 
 vector<string> Database::getInfoNetUser(string username)
@@ -208,6 +213,7 @@ vector<string> Database::getInfoNetUser(string username)
 		values.push_back(it->second.front());
 	}
 	results.clear();
+	sqlite3_close(db);
 
 	return values;
 }
@@ -243,6 +249,8 @@ void Database::insertNewGroup(string name, string password)
 		sqlite3_free(zErrMsg);
 		system("Pause");
 	}
+
+	sqlite3_close(db);
 }
 
 void Database::addUserToGroup(string groupName, string username)
@@ -268,9 +276,24 @@ void Database::addUserToGroup(string groupName, string username)
 		system("Pause");
 	}
 
-	unordered_map<string, vector<string>>::iterator it;
+	auto it = results.begin();
+	if (it->second.size() > 0)
+	{
+		string currentUsers = it->second[0];
+		currentUsers += "/" + username;
+
+		sqlQuery = "UPDATE t_groups SET users = \"" + currentUsers + "\" WHERE group_name = \"" + groupName + "\"";
+		rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+		if (rc != SQLITE_OK)
+		{
+			cout << "SQL error: " << zErrMsg << endl;
+			sqlite3_free(zErrMsg);
+			system("Pause");
+		}
+	}
 
 	results.clear();
+	sqlite3_close(db);
 }
 
 vector<pair<string,string>> Database::getInfoAboutGroups()
@@ -324,6 +347,8 @@ vector<pair<string,string>> Database::getInfoAboutGroups()
 		groups.push_back(pair<string, string>(values.at(i)[0], values.at(i)[1]));
 	}
 
+	sqlite3_close(db);
+
 	return groups;
 }
 
@@ -362,6 +387,7 @@ string Database::getUserEmail(string username)
 	}	
 
 	results.clear();
+	sqlite3_close(db);
 
 	return " ";
 }
@@ -390,6 +416,7 @@ void Database::deleteAllNetworkUsers()
 	}
 
 	results.clear();
+	sqlite3_close(db);
 }
 
 vector<string> Database::getAllNetUsersInfo()
@@ -429,8 +456,60 @@ vector<string> Database::getAllNetUsersInfo()
 	}
 
 	results.clear();
+	sqlite3_close(db);
 
 	return users;
+}
+
+void Database::deleteUserFromGroup(string username, string groupName)
+{
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+	}
+
+	sqlQuery = "SELECT users FROM t_groups WHERE group_name = \"" + groupName + "\"";
+	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+	}
+
+	auto it = results.begin();
+	if (it->second.size() > 0)
+	{
+		string currentUsers = it->second[0]; // Get the currrent list of users
+		vector<string> users = Helper::split(currentUsers, '/'); // Split them into a vector
+		currentUsers = "";
+		for (string user : users)
+		{
+			if (username.compare(user) != 0) // Insert all users but the user given as an argument
+				currentUsers += user += "/";
+		}
+		if (currentUsers.length() > 0)
+			currentUsers.pop_back(); // Pop the last '/' enterted
+
+		sqlQuery = "UPDATE t_groups SET users = \"" + currentUsers + "\" WHERE group_name = \"" + groupName + "\"";
+		rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+		if (rc != SQLITE_OK)
+		{
+			cout << "SQL error: " << zErrMsg << endl;
+			sqlite3_free(zErrMsg);
+			system("Pause");
+		}
+	}
+
+	results.clear();
+	sqlite3_close(db);
 }
 
 int Database::callback(void* notUsed, int argc, char** argv, char** azCol)

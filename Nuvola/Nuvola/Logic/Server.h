@@ -43,9 +43,9 @@ private:
 
 	void bindAndListen();
 	void accept();
-	void clientHandler(SOCKET clientSocket);
+	void clientHandler(SOCKET clientSocket, string IP);
 
-	ReceivedMessage* buildRecieveMessage(SOCKET clientSocket, int typeCode);
+	ReceivedMessage* buildRecieveMessage(SOCKET clientSocket, int typeCode, string IP);
 	void addReceivedMessage(ReceivedMessage* msg);
 	void handleReceivedMessages();
 
@@ -61,6 +61,7 @@ private:
 	void handleAddUserToGroup(ReceivedMessage* msg);
 	void handleGetInfoAboutGroups(ReceivedMessage* msg);
 	void handleUploadFileToGroup(ReceivedMessage* msg);
+	void handleDeleteUserFromGroup(ReceivedMessage* msg);
 
 	void handleFinishWork(ReceivedMessage* msg);
 

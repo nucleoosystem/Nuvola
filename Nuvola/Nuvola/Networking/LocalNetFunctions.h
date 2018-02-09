@@ -46,6 +46,8 @@ public:
 	static int sendFileToIp(char* ip, char* path);
 	static std::vector<std::string> split(const std::string &text, char sep);
 	static string usernameToIP(string username);
+	static void addUserToList(string username, string IP);
+	static void writeToIpsFile(string ip, string username, string email, string cloudSize);
 
 private:
 	static std::vector<std::pair<std::string, std::string>> getLocalIpAddress();

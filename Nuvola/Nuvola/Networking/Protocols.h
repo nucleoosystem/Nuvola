@@ -28,6 +28,7 @@ namespace Protocol
 	const int ADD_USER_TO_GROUP = 207;
 	const int GET_INFO_ABOUT_GROUPS = 208;
 	const int UPLOAD_FILE_TO_GROUP = 209;
+	const int DELETE_USER_FROM_GROUP = 212;
 
 	const int GET_WORK_END = 211;
 }

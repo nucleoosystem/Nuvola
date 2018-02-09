@@ -56,7 +56,10 @@ namespace NuvolaWPF.Pages
                     }
                     else
                     {
-                        sh.recvDataWithSize();
+                        List<string> values = new List<string>();
+                        values.Add(sh.recvDataWithSize());
+
+                        groups[groupName] = values;
                     }
                 }
             }
@@ -71,10 +74,15 @@ namespace NuvolaWPF.Pages
             var item = ItemsControl.ContainerFromElement(sender as ListBox, e.OriginalSource as DependencyObject) as ListBoxItem;
             if (item != null)
             {
-                groupNameLbl.Content = item.Content;
-                usersLbl.Content = groups[item.Content.ToString()][0];
                 usersCombo.Items.Clear();
+                usersList.Items.Clear();
+                
+                groupNameLbl.Content = item.Content;
 
+                string[] users = groups[item.Content.ToString()][0].Split('/');
+                for (int i = 0; i < users.Length; i++)
+                    usersList.Items.Add(users[i]);
+               
                 try
                 {
                     SocketHandler sh = new SocketHandler();
@@ -124,7 +132,7 @@ namespace NuvolaWPF.Pages
             }
 
             string data = "209";
-            data += groupNameLbl.Content.ToString().PadLeft(2, '0');
+            data += groupNameLbl.Content.ToString().Length.ToString().PadLeft(2, '0');
             data += groupNameLbl.Content.ToString();
             data += fileName.Length.ToString().PadLeft(2, '0');
             data += fileName;
@@ -138,6 +146,58 @@ namespace NuvolaWPF.Pages
             {
                 // TODO : Handle Socket Exception
             }
+        }
+
+        private void addBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(usersCombo.SelectedValue != null)
+            {
+                string username = usersCombo.SelectedValue.ToString();
+                string groupName = groupNameLbl.Content.ToString();
+
+                string data = "207";
+                data += username.Length.ToString().PadLeft(2, '0');
+                data += username;
+                data += groupName.Length.ToString().PadLeft(2, '0');
+                data += groupName;
+
+                SocketHandler sh = new SocketHandler();
+                try
+                {
+                    sh.sendData(data);
+                }
+                catch (SocketException ex)
+                {
+                    MessageBox.Show(ex.Data.ToString());
+                }
+
+                GetInfoAboutGroups();
+            }
+        }
+
+        private void deleteBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Button btn = sender as Button;
+            string username = btn.DataContext as string;
+            string groupName = groupNameLbl.Content.ToString();
+
+            string data = "212";
+            data += username.Length.ToString().PadLeft(2, '0');
+            data += username;
+            data += groupName.Length.ToString().PadLeft(2, '0');
+            data += groupName;
+
+            SocketHandler sh = new SocketHandler();
+            try
+            {
+                sh.sendData(data);
+            }
+            catch(SocketException ex)
+            {
+                MessageBox.Show(ex.Data.ToString());
+            }
+
+            GetInfoAboutGroups();
         }
     }
 }

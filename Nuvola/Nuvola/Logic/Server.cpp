@@ -2,8 +2,8 @@
 
 
 std::condition_variable cv; // Lockes the handle message function until a message has arrived
-queue<ReceivedMessage*> _queRcvMessages;
-User* Server::currentUser = NULL;
+queue<ReceivedMessage*> _queRcvMessages; // Hold the messages recieved from the user
+User* Server::currentUser = NULL; // Holds the current user
 
 Server::Server()
 {
@@ -29,12 +29,12 @@ Server::~Server()
 
 void Server::serve()
 {
-	db->deleteAllNetworkUsers();
+	db->deleteAllNetworkUsers(); // On every run delete every known user on the network
 
-	thread handleFiles(&LocalNetFunctions::receiveFile);
+	thread handleFiles(&LocalNetFunctions::receiveFile); // Wait until you get a file
 	handleFiles.detach();
 
-	thread t1(&Server::handleReceivedMessages, this);
+	thread t1(&Server::handleReceivedMessages, this); // Handle received messages from the user
 	t1.detach();
 
 	bindAndListen(); // Calling the function that will wait for a client response
@@ -79,15 +79,21 @@ void Server::bindAndListen()
 
 void Server::accept()
 {
+	SOCKET newConnection;
+	SOCKADDR_IN addr;
+	int addrlen = sizeof(addr);
+
 	SOCKET clientSocket = INVALID_SOCKET;
-	clientSocket = ::accept(_serverSocket, NULL, NULL); // Accepting the client that wants to connect
+	clientSocket = ::accept(_serverSocket, (SOCKADDR*)&addr, &addrlen); // Accepting the client that wants to connect
+
+	char *ip = inet_ntoa(addr.sin_addr);
 
 	if (clientSocket == INVALID_SOCKET) // If the accept function was not successful
 		throw std::exception(__FUNCTION__);
 
 	std::cout << "Client accepted. Server and client can speak" << std::endl;
 
-	thread t1(&Server::clientHandler, this, clientSocket); // Creating a thread of the client handler function
+	thread t1(&Server::clientHandler, this, clientSocket, ip); // Creating a thread of the client handler function
 	t1.detach();
 }
 
@@ -96,7 +102,7 @@ void Server::handleReceivedMessages()
 	while (1)
 	{
 		std::unique_lock<std::mutex> lck(_mtxReceivedMessages);
-		cv.wait(lck, []{return _queRcvMessages.size() != 0; });
+		cv.wait(lck, []{return _queRcvMessages.size() != 0; }); // Wait until there are messages
 
 		ReceivedMessage* msg = _queRcvMessages.front(); // Gets the message from the queue
 		_queRcvMessages.pop();
@@ -146,11 +152,15 @@ void Server::handleReceivedMessages()
 		case Protocol::GET_WORK_END:
 			handleFinishWork(msg);
 			break;
+
+		case Protocol::DELETE_USER_FROM_GROUP:
+			handleDeleteUserFromGroup(msg);
+			break;
 		}	
 	}
 }
 
-void Server::clientHandler(SOCKET clientSocket)
+void Server::clientHandler(SOCKET clientSocket, string IP)
 {
 	ReceivedMessage* msg = NULL;
 	int typeCode = 0;
@@ -160,7 +170,7 @@ void Server::clientHandler(SOCKET clientSocket)
 		do
 		{
 			typeCode = Helper::getMessageTypeCode(clientSocket);
-			msg = buildRecieveMessage(clientSocket, typeCode); // Builds the message
+			msg = buildRecieveMessage(clientSocket, typeCode, IP); // Builds the message
 			addReceivedMessage(msg); // Adds the message to the messages queue 
 		} while (typeCode != 0);
 	}
@@ -180,7 +190,7 @@ void Server::addReceivedMessage(ReceivedMessage* msg)
 	cv.notify_all(); // Unlockes all locked functions
 }
 
-ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode)
+ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode, string IP)
 {
 	vector<string> vec;
 	int length = 0;
@@ -231,6 +241,20 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode)
 		}
 	}
 
+	else if (typeCode == Protocol::GET_USER_INFO_REQUEST)
+	{
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string username = Helper::getStringPartFromSocket(clientSocket, length);
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string email = Helper::getStringPartFromSocket(clientSocket, length);
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string cloudSize = Helper::getStringPartFromSocket(clientSocket, length);
+
+		vec.push_back(username);
+		vec.push_back(email);
+		vec.push_back(cloudSize);
+	}
+
 	else if (typeCode == Protocol::CREATE_NEW_GROUP)
 	{
 		length = Helper::getIntPartFromSocket(clientSocket, 2);
@@ -264,7 +288,18 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode)
 		vec.push_back(filePath);
 	}
 
-	return new ReceivedMessage(clientSocket, typeCode, vec);
+	else if (typeCode == Protocol::DELETE_USER_FROM_GROUP)
+	{
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string username = Helper::getStringPartFromSocket(clientSocket, length);
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string groupname = Helper::getStringPartFromSocket(clientSocket, length);
+
+		vec.push_back(username);
+		vec.push_back(groupname);
+	}
+
+	return new ReceivedMessage(clientSocket, typeCode, vec, IP);
 }
 
 bool Server::handleSignup(ReceivedMessage* msg)
@@ -326,8 +361,8 @@ void Server::handleSignout(ReceivedMessage* msg)
 
 int Server::handleUploadFile(ReceivedMessage* msg)
 {
-	string filePath = msg->getValues()[0];
-	int encrypt = atoi(msg->getValues()[1].c_str());
+	string filePath = msg->getValues()[0]; // Get the file path that the user wants to send
+	int encrypt = atoi(msg->getValues()[1].c_str()); // Get if the user wants to encrypt the file or not
 	vector<string> ips;
 
 	for (int i = 2; i < msg->getValues().size(); i++)
@@ -347,6 +382,10 @@ int Server::handleUploadFile(ReceivedMessage* msg)
 
 void Server::handleGetUserInfo(ReceivedMessage* msg)
 {	
+	LocalNetFunctions::writeToIpsFile(msg->getIP(), msg->getValues()[0], msg->getValues()[1], msg->getValues()[2]);
+	db->insertNetworkUser(msg->getValues()[0], msg->getValues()[1], msg->getValues()[2]);
+	LocalNetFunctions::addUserToList(msg->getValues()[0], msg->getIP());
+
 	if (currentUser)
 	{
 		string sendString = "102";
@@ -460,4 +499,9 @@ void Server::handleFinishWork(ReceivedMessage* msg)
 {
 	thread findIps(&LocalNetFunctions::getUsersOnNetwork, msg->getSock());
 	findIps.detach();
+}
+
+void Server::handleDeleteUserFromGroup(ReceivedMessage* msg)
+{
+	db->deleteUserFromGroup(msg->getValues()[0], msg->getValues()[1]);
 }
