@@ -20,6 +20,8 @@ namespace Protocol
 
 	const int UPLOAD_FILE_REQUEST = 203;
 	const int GET_FILE = 204;
+	const int GET_ALL_FILES_INFO = 213;
+	const int GET_YOUR_FILE_BACK = 214;
 
 	const int GET_USER_INFO_REQUEST = 205;
 	const int GET_ALL_USERS = 210;

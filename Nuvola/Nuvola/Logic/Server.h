@@ -50,6 +50,7 @@ private:
 	void handleReceivedMessages();
 
 	int handleUploadFile(ReceivedMessage* msg);
+	void handleGetAllFilesInfo(ReceivedMessage* msg);
 
 	bool handleSignup(ReceivedMessage* msg);
 	User* handleSignin(ReceivedMessage* msg);

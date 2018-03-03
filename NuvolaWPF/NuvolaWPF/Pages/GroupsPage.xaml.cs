@@ -50,14 +50,32 @@ namespace NuvolaWPF.Pages
                         groupsList.Items.Add(newItem);
 
                         List<string> values = new List<string>();
-                        values.Add(sh.recvDataWithSize());
+                        int length = sh.getDataLen(2);
+                        if (length != 0)
+                        {
+                            string data = sh.recvDataWithGivenSize(length);
+                            values.Add(data);
+                        }
+                        else
+                        {
+                            values.Add("");
+                        }
 
                         groups[newItem.Content.ToString()] = values;
                     }
                     else
                     {
                         List<string> values = new List<string>();
-                        values.Add(sh.recvDataWithSize());
+                        int length = sh.getDataLen(2);
+                        if (length != 0)
+                        {
+                            string data = sh.recvDataWithGivenSize(length);
+                            values.Add(data);
+                        }
+                        else
+                        {
+                            values.Add("");
+                        }
 
                         groups[groupName] = values;
                     }
@@ -81,7 +99,10 @@ namespace NuvolaWPF.Pages
 
                 string[] users = groups[item.Content.ToString()][0].Split('/');
                 for (int i = 0; i < users.Length; i++)
-                    usersList.Items.Add(users[i]);
+                {
+                    if(users[i] != "")
+                        usersList.Items.Add(users[i]);
+                }
                
                 try
                 {
@@ -134,7 +155,7 @@ namespace NuvolaWPF.Pages
             string data = "209";
             data += groupNameLbl.Content.ToString().Length.ToString().PadLeft(2, '0');
             data += groupNameLbl.Content.ToString();
-            data += fileName.Length.ToString().PadLeft(2, '0');
+            data += fileName.Length.ToString().PadLeft(3, '0');
             data += fileName;
 
             SocketHandler sh = new SocketHandler();
@@ -172,6 +193,7 @@ namespace NuvolaWPF.Pages
                 }
 
                 GetInfoAboutGroups();
+                updateView(groupName);
             }
         }
 
@@ -198,6 +220,40 @@ namespace NuvolaWPF.Pages
             }
 
             GetInfoAboutGroups();
+            updateView(groupName);
+        }
+
+        private void updateView(string groupName)
+        {
+            usersCombo.Items.Clear();
+            usersList.Items.Clear();
+
+            groupNameLbl.Content = groupName;
+
+            string[] users = groups[groupName][0].Split('/');
+            for (int i = 0; i < users.Length; i++)
+            {
+                if (users[i] != "")
+                    usersList.Items.Add(users[i]);
+            }
+
+            try
+            {
+                SocketHandler sh = new SocketHandler();
+                sh.sendData("210");
+
+                sh.getMsgCode();
+                int amount = int.Parse(sh.recvDataWithSize());
+                for (int i = 0; i < amount; i++)
+                {
+                    string username = sh.recvDataWithSize();
+                    usersCombo.Items.Add(username);
+                }
+            }
+            catch (SocketException)
+            {
+                // TODO : Handle exception
+            }
         }
     }
 }

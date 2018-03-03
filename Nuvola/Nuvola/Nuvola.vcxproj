@@ -52,11 +52,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files\Microsoft CNG Development Kit\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <AdditionalDependencies>bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>Nuvola.exe.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -94,6 +97,8 @@
     <ClCompile Include="Networking\LocalNetFunctions.cpp" />
     <ClCompile Include="Networking\WComm.cpp" />
     <ClCompile Include="Networking\WSAInitializer.cpp" />
+    <ClCompile Include="Security\Crypt.cpp" />
+    <ClCompile Include="Security\FileEncrypt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DB\Database.h" />
@@ -110,6 +115,8 @@
     <ClInclude Include="Networking\Protocols.h" />
     <ClInclude Include="Networking\WComm.h" />
     <ClInclude Include="Networking\WSAInitializer.h" />
+    <ClInclude Include="Security\Crypt.h" />
+    <ClInclude Include="Security\FileEncrypt.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Logic\diskPartScript.txt" />

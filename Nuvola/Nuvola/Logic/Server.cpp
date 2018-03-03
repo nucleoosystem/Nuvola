@@ -156,6 +156,9 @@ void Server::handleReceivedMessages()
 		case Protocol::DELETE_USER_FROM_GROUP:
 			handleDeleteUserFromGroup(msg);
 			break;
+
+		case Protocol::GET_ALL_FILES_INFO:
+			handleGetAllFilesInfo(msg);
 		}	
 	}
 }
@@ -225,7 +228,7 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode, 
 
 	else if (typeCode == Protocol::UPLOAD_FILE_REQUEST)
 	{
-		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		length = Helper::getIntPartFromSocket(clientSocket, 3);
 		string filePath = Helper::getStringPartFromSocket(clientSocket, length);
 		int encrypt = Helper::getIntPartFromSocket(clientSocket, 1);
 		vec.push_back(filePath);
@@ -281,7 +284,7 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode, 
 	{
 		length = Helper::getIntPartFromSocket(clientSocket, 2);
 		string groupName = Helper::getStringPartFromSocket(clientSocket, length);
-		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		length = Helper::getIntPartFromSocket(clientSocket, 3);
 		string filePath = Helper::getStringPartFromSocket(clientSocket, length);
 
 		vec.push_back(groupName);
@@ -445,6 +448,7 @@ string Server::getCurrentUsername()
 	{
 		return currentUser->getUserName();
 	}
+	return "";
 }
 
 SOCKET Server::getCurrentSocket()
@@ -453,6 +457,7 @@ SOCKET Server::getCurrentSocket()
 	{
 		return currentUser->getSocket();
 	}
+	return NULL;
 }
 
 void Server::handleUploadFileToGroup(ReceivedMessage* msg)
@@ -504,4 +509,26 @@ void Server::handleFinishWork(ReceivedMessage* msg)
 void Server::handleDeleteUserFromGroup(ReceivedMessage* msg)
 {
 	db->deleteUserFromGroup(msg->getValues()[0], msg->getValues()[1]);
+}
+
+void Server::handleGetAllFilesInfo(ReceivedMessage* msg)
+{
+	vector<vector<string>> values = db->getAllFilesInfo();
+	string data = "106";
+	data += Helper::getPaddedNumber(to_string(values.size()).length(), 2);
+	data += to_string(values.size());
+	
+	for (auto it : values)
+	{
+		data += Helper::getPaddedNumber(it[0].length(), 3);
+		data += it[0];
+		data += Helper::getPaddedNumber(it[1].length(), 2);
+		data += it[1];
+		data += Helper::getPaddedNumber(it[2].length(), 2);
+		data += it[2];
+		data += Helper::getPaddedNumber(it[3].length(), 2);
+		data += it[3];		
+	}
+
+	Helper::sendData(msg->getSock(), data);
 }

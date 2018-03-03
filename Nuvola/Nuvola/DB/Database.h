@@ -33,6 +33,9 @@ public:
 	vector<pair<string,string>>  getInfoAboutGroups();
 	void deleteUserFromGroup(string username, string groupName);
 
+	bool addFileToDB(string name, string type, string user, string size);
+	vector<vector<string>> getAllFilesInfo();
+
 	static int callback(void*, int, char**, char**);
 
 private:

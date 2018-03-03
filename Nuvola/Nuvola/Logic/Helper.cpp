@@ -119,3 +119,27 @@ std::vector<std::string> Helper::split(const std::string &text, char sep)
 	tokens.push_back(text.substr(start));
 	return tokens;
 }
+
+int Helper::getFileSize(string path)
+{
+	std::ifstream f;
+	f.open(path, std::ios_base::binary | std::ios_base::in);
+
+	if (!f.good() || f.eof() || !f.is_open()) 
+	{ 
+		return 0; 
+	}
+
+	f.seekg(0, std::ios_base::beg);
+	std::ifstream::pos_type begin_pos = f.tellg();
+	f.seekg(0, std::ios_base::end);
+
+	return static_cast<int>(f.tellg() - begin_pos);
+}
+
+string Helper::getFileExtension(string fileName)
+{
+	if (fileName.find_last_of(".") != std::string::npos)
+		return fileName.substr(fileName.find_last_of(".") + 1);
+	return "";
+}

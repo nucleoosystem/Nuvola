@@ -66,3 +66,5 @@ C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\Nuvol
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\bin\Debug\FontAwesome.WPF.xml
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\LoadingPage.baml
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\LoadingPage.g.cs
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Files\UploadedFiles.baml
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Files\UploadedFiles.g.cs

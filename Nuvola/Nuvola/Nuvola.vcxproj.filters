@@ -81,6 +81,12 @@
     <ClCompile Include="Logic\HardDiskManager.cpp">
       <Filter>Source Files\Logic</Filter>
     </ClCompile>
+    <ClCompile Include="Security\FileEncrypt.cpp">
+      <Filter>Source Files\Security</Filter>
+    </ClCompile>
+    <ClCompile Include="Security\Crypt.cpp">
+      <Filter>Source Files\Security</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DB\Database.h">
@@ -124,6 +130,12 @@
     </ClInclude>
     <ClInclude Include="Logic\HardDiskManager.h">
       <Filter>Header Files\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="Security\FileEncrypt.h">
+      <Filter>Header Files\Security</Filter>
+    </ClInclude>
+    <ClInclude Include="Security\Crypt.h">
+      <Filter>Header Files\Security</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

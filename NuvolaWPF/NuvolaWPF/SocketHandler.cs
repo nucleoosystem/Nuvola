@@ -75,5 +75,21 @@ namespace NuvolaWPF
             string msgCode = System.Text.Encoding.Default.GetString(ba);
             return int.Parse(msgCode);
         }
+
+        public int getDataLen(int padding)
+        {
+            byte[] ba = new byte[padding];
+            s.Receive(ba);
+            string length = System.Text.Encoding.Default.GetString(ba);
+            return int.Parse(length);
+        }
+
+        public string recvDataWithGivenSize(int length)
+        {
+            byte[] ba = new byte[length];
+            s.Receive(ba);
+            string data = System.Text.Encoding.Default.GetString(ba);
+            return data;
+        }
     }
 }

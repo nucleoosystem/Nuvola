@@ -120,7 +120,7 @@ void LocalNetFunctions::getIpAddrsFromFile(string fileName)
 			ipsAndResults.emplace_back(std::async(std::launch::async, isUserOnComputer, ip));
 		}	
 
-		for (int i = 0; i < ipsAndResults.size(); i++)
+		for (unsigned int i = 0; i < ipsAndResults.size(); i++)
 		{
 			if (std::find(allLocalAddrs.begin(), allLocalAddrs.end(), foundIps[i]) == allLocalAddrs.end())
 			{
@@ -326,6 +326,9 @@ int LocalNetFunctions::sendFileToIp(char* ip, char* path)
 	// Send Close Connection Signal
 	w.sendData("EndConnection"); w.recvData(strdup(rec.c_str()), 32);
 
+	Database* db = new Database();
+	db->addFileToDB(path, Helper::getFileExtension(path), LocalNetFunctions::IPToUsername(ip), to_string(Helper::getFileSize(path)));
+
 	//delete rec;
 	return 0;
 }
@@ -359,6 +362,7 @@ int LocalNetFunctions::receiveFile()
 			}
 			if (strcmp(rec, "EndConnection") == 0)break;
 		}
+		cout << "Finished getting" << endl;
 		// Disconnect client
 		w.closeConnection();
 	}
@@ -384,6 +388,17 @@ void LocalNetFunctions::addUserToList(string username, string IP)
 	{
 		usersToIps[username] = IP;
 	}
+}
+
+string LocalNetFunctions::IPToUsername(string ip)
+{
+	auto it = usersToIps.begin();
+	for (it; it != usersToIps.end(); it++)
+	{
+		if (it->second.compare(ip) == 0)
+			return it->first;
+	}
+	return "";
 }
 
 void LocalNetFunctions::writeToIpsFile(string ip, string username, string email, string cloudSize)

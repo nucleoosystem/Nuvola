@@ -39,6 +39,8 @@ public:
 	static void sendData(SOCKET sc, std::string message);
 	static string getPaddedNumber(int num, int digits);
 	static std::vector<std::string> split(const std::string &text, char sep);
+	static int getFileSize(string path);
+	static string getFileExtension(string fileName);
 
 private:
 	static char* getPartFromSocket(SOCKET sc, int bytesNum);

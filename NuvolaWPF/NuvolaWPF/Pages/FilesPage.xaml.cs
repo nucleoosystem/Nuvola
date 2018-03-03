@@ -22,7 +22,7 @@ namespace NuvolaWPF.Pages
     public partial class FilesPage : UserControl
     {
         static bool isClosing = false;
-        
+
         public FilesPage()
         {
             InitializeComponent();
@@ -43,7 +43,7 @@ namespace NuvolaWPF.Pages
             webView.GoBack();
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             if (isClosing)
             {

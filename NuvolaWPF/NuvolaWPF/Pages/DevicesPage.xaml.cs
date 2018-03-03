@@ -85,7 +85,7 @@ namespace NuvolaWPF.Pages
                 // Open document
                 fileName = dlg.FileName;
 
-                string data = "203" + fileName.Length.ToString().PadLeft(2, '0') + fileName;
+                string data = "203" + fileName.Length.ToString().PadLeft(3, '0') + fileName;
                 data += "0"; // No encryption   
                 data += "01" + "1"; // One user
 

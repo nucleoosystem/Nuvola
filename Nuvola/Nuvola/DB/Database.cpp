@@ -279,16 +279,26 @@ void Database::addUserToGroup(string groupName, string username)
 	auto it = results.begin();
 	if (it->second.size() > 0)
 	{
+		bool wasUserFound = false;
 		string currentUsers = it->second[0];
-		currentUsers += "/" + username;
-
-		sqlQuery = "UPDATE t_groups SET users = \"" + currentUsers + "\" WHERE group_name = \"" + groupName + "\"";
-		rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
-		if (rc != SQLITE_OK)
+		vector<string> usersSplit = Helper::split(currentUsers, '/');
+		for (string user : usersSplit)
 		{
-			cout << "SQL error: " << zErrMsg << endl;
-			sqlite3_free(zErrMsg);
-			system("Pause");
+			if (user.compare(username) == 0)
+				wasUserFound = true;
+		}
+		if (!wasUserFound) // If the user is not located already in the group
+		{
+			currentUsers += "/" + username;
+
+			sqlQuery = "UPDATE t_groups SET users = \"" + currentUsers + "\" WHERE group_name = \"" + groupName + "\"";
+			rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+			if (rc != SQLITE_OK)
+			{
+				cout << "SQL error: " << zErrMsg << endl;
+				sqlite3_free(zErrMsg);
+				system("Pause");
+			}
 		}
 	}
 
@@ -510,6 +520,91 @@ void Database::deleteUserFromGroup(string username, string groupName)
 
 	results.clear();
 	sqlite3_close(db);
+}
+
+bool Database::addFileToDB(string name, string type, string user, string size)
+{
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+		return false;
+	}
+
+	sqlQuery = "INSERT INTO t_files (filename, type, at_user, filesize) VALUES(\'";
+	sqlQuery += name + "\',\'";
+	sqlQuery += type + "\',\'";
+	sqlQuery += user + "\',";
+	sqlQuery += size + ")";
+
+	rc = sqlite3_exec(db, sqlQuery.c_str(), NULL, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+		return false;
+	}
+
+	sqlite3_close(db);
+
+	return true;
+}
+
+vector<vector<string>> Database::getAllFilesInfo()
+{
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	vector<vector<string>> values;
+
+
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+		return values;
+	}
+
+	sqlQuery = "SELECT * FROM t_files";
+	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+		return values;
+	}
+
+	int length = results.begin()->second.size();
+	for (int i = 0; i < length; i++)
+	{
+		values.push_back(vector<string>());
+	}
+
+	unordered_map<string, vector<string>>::iterator it;
+	int current = 0;
+	for (auto it = results.begin(); it != results.end(); it++)
+	{
+		for (int i = 0; i < length; i++)
+		{
+			values[i].push_back(it->second.at(i));
+		}
+	}
+	results.clear();
+
+	sqlite3_close(db);
+
+	return values;
 }
 
 int Database::callback(void* notUsed, int argc, char** argv, char** azCol)
