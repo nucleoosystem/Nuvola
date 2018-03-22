@@ -64,6 +64,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="AsyncBlockingSocket.cs" />
     <Compile Include="Pages\Files\UploadedFiles.xaml.cs">
       <DependentUpon>UploadedFiles.xaml</DependentUpon>
     </Compile>
@@ -72,6 +73,9 @@
     </Compile>
     <Compile Include="Pages\Login\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Settings\VHDSettings.xaml.cs">
+      <DependentUpon>VHDSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="SocketHandler.cs" />
     <Page Include="MainWindow.xaml">
@@ -155,6 +159,10 @@
       <DependentUpon>UploadPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Page Include="Pages\Settings\VHDSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\UploadPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

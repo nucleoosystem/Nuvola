@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="NuvolaWPF.Pages.Settings.VHDSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <ScrollViewer>
+            <StackPanel x:Name="Panel" MinWidth="150">
+                <TextBlock Text="VIRTUAL HARD DRIVE" Style="{StaticResource Heading2}" Margin="0,0,0,8" />
+                
+                <TextBlock FontWeight="Bold" Text="Hard Drive Size: "/> 
+                <TextBox Width="100" HorizontalAlignment="Left"></TextBox>
+                <Button Content="Save" HorizontalAlignment="Left" Width="100" Margin="0,10,0,0" Name="saveBtn" Click="saveBtn_Click"></Button>
+
+                <Button FontSize="26" Foreground="Red" Content="Delete Hard Drive" Margin="0,50,0,0" Name="deleteBtn" Click="deleteBtn_Click"></Button>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

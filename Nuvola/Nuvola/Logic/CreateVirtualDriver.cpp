@@ -98,8 +98,7 @@ void diskpartCall()
 
 	CreateProcess(lpApplicationName, lpCommandLine, NULL, NULL, TRUE, creationFlags, NULL, NULL, &si, &pi);
 
-	system("Pause");
-	std::cout << "Success" << std::endl;
+	std::cout << "Success Creating" << std::endl;
 }
 
 
@@ -140,4 +139,47 @@ void editDiskpartCommands(PCWSTR path)
 			file.write(commands[i].c_str(), commands[i].size());
 		}
 	}
+}
+
+void deleteVirtualHardDriver(string path)
+{
+	std::vector<std::string> commands;
+	commands.push_back("select volume N");
+	commands.push_back("delete volume");
+
+	std::ofstream file;
+	char* currentPath = NULL;
+	std::string fullPath = " ";
+
+	currentPath = _getcwd(NULL, 0);
+
+	fullPath = currentPath;
+	fullPath += "\\";
+	fullPath += "diskPartDelete.txt";
+
+	file.open(fullPath, std::ios::trunc);
+	if (file.is_open())
+	{
+		file.write(commands[0].c_str(), commands[0].size());
+		file.write(commands[1].c_str(), commands[1].size());
+	}
+
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	ZeroMemory(&pi, sizeof(pi));
+	si.cb = sizeof(si);
+	si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+	si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+	si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+	si.wShowWindow = SW_HIDE;
+
+	LPCTSTR lpApplicationName = L"c:\\WINDOWS\\system32\\diskpart.exe";
+	LPTSTR lpCommandLine = L"diskpart.exe /s diskPartDelete.txt";
+	DWORD creationFlags = CREATE_NO_WINDOW;
+
+	CreateProcess(lpApplicationName, lpCommandLine, NULL, NULL, TRUE, creationFlags, NULL, NULL, &si, &pi);
+
+	std::cout << "Success Deleting" << std::endl;
 }

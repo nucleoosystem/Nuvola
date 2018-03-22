@@ -7,6 +7,8 @@
 #include <fstream>
 #include <vector>
 
+using namespace std;
+
 #pragma comment(lib, "virtdisk.lib")
 
 /* The function is the main function of the cpp file.
@@ -24,3 +26,6 @@ void diskpartCall();
 
 /* The function changes the diskpart commands file based on the given path. */
 void editDiskpartCommands(PCWSTR path);
+
+/* The function deletes the local virtual hard drive. */
+void deleteVirtualHardDriver(string path);

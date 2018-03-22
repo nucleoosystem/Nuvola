@@ -54,7 +54,9 @@ string Helper::getStringPartFromSocket(SOCKET sc, int bytesNum)
 	{
 		cout << e.what() << endl;
 	}
+
 	string res(s);
+	res = MsgEncrypt::Decipher(res, "cipher");
 	return res;
 }
 
@@ -142,4 +144,34 @@ string Helper::getFileExtension(string fileName)
 	if (fileName.find_last_of(".") != std::string::npos)
 		return fileName.substr(fileName.find_last_of(".") + 1);
 	return "";
+}
+
+string Helper::getCurrentPath()
+{
+	char buffer[MAX_PATH];
+	GetModuleFileNameA(NULL, buffer, MAX_PATH);
+	string::size_type pos = string(buffer).find_last_of("\\/");
+	return string(buffer).substr(0, pos);
+}
+
+std::wstring Helper::s2ws(const std::string& s)
+{
+	int len;
+	int slength = (int)s.length() + 1;
+	len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
+	wchar_t* buf = new wchar_t[len];
+	MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+	std::wstring r(buf);
+	delete[] buf;
+	return r;
+}
+
+void Helper::sendBlockingData(SOCKET sc, std::string message)
+{
+	const char* data = message.c_str();
+
+	if (send(sc, data, message.size(), 0) == INVALID_SOCKET)
+	{
+		throw std::exception("Error while sending message to client");
+	}
 }

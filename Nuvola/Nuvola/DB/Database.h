@@ -23,6 +23,7 @@ public:
 	bool isUserAndPassMatch(string username, string password);
 
 	string getUserEmail(string username);
+	string getUserCloudSize(string username);
 	void insertNetworkUser(string name, string email, string cloudSize);
 	vector<string> getInfoNetUser(string username);
 	void deleteAllNetworkUsers();

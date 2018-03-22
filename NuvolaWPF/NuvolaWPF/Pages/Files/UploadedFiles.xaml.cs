@@ -82,10 +82,25 @@ namespace NuvolaWPF.Pages.Files
         {
             DataGrid dataGridVar = dataGrid;
             DataGridRow Row = (DataGridRow)dataGridVar.ItemContainerGenerator.ContainerFromIndex(dataGridVar.SelectedIndex);
-            DataGridCell RowAndColumn = (DataGridCell)dataGridVar.Columns[0].GetCellContent(Row).Parent;
-            string fileName = ((TextBlock)RowAndColumn.Content).Text;
 
-            MessageBox.Show(fileName, fileName);
+            DataGridCell atUserCol = (DataGridCell)dataGridVar.Columns[2].GetCellContent(Row).Parent; 
+            DataGridCell fileNameCol = (DataGridCell)dataGridVar.Columns[0].GetCellContent(Row).Parent;
+            string atUser = ((TextBlock)atUserCol.Content).Text;
+            string fileName = ((TextBlock)fileNameCol.Content).Text;
+
+            string data = "214";
+            data += fileName.Length.ToString().PadLeft(2, '0') + fileName;
+            data += atUser.Length.ToString().PadLeft(2, '0') + atUser;
+
+            SocketHandler sh = new SocketHandler();
+            try
+            {
+                sh.sendData(data);
+            }
+            catch(SocketException ex)
+            {
+                MessageBox.Show(ex.Data.ToString());
+            }
         }
     }
 

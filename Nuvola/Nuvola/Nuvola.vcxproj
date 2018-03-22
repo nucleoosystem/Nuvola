@@ -99,6 +99,7 @@
     <ClCompile Include="Networking\WSAInitializer.cpp" />
     <ClCompile Include="Security\Crypt.cpp" />
     <ClCompile Include="Security\FileEncrypt.cpp" />
+    <ClCompile Include="Security\MsgEncrypt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DB\Database.h" />
@@ -117,6 +118,7 @@
     <ClInclude Include="Networking\WSAInitializer.h" />
     <ClInclude Include="Security\Crypt.h" />
     <ClInclude Include="Security\FileEncrypt.h" />
+    <ClInclude Include="Security\MsgEncrypt.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Logic\diskPartScript.txt" />

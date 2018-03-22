@@ -255,5 +255,38 @@ namespace NuvolaWPF.Pages
                 // TODO : Handle exception
             }
         }
+
+        private void leaveBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(groupNameLbl.Content != null)
+            {
+                string groupName = groupNameLbl.Content.ToString();
+
+                string data = "215";
+                data += groupName.Length.ToString().PadLeft(2, '0');
+                data += groupName;
+
+                SocketHandler sh = new SocketHandler();
+                try
+                {
+                    sh.sendData(data);
+                }
+                catch (SocketException ex)
+                {
+                    MessageBox.Show(ex.Data.ToString());
+                }
+
+                GetInfoAboutGroups();
+                updateView(groupName);
+
+                groupsList.Items.RemoveAt(groupsList.SelectedIndex);
+                groupsList.SelectedItem = null;
+
+                usersCombo.Items.Clear();
+                usersList.Items.Clear();
+
+                groupNameLbl.Content = null;
+            }
+        }
     }
 }

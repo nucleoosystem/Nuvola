@@ -21,7 +21,8 @@ namespace Protocol
 	const int UPLOAD_FILE_REQUEST = 203;
 	const int GET_FILE = 204;
 	const int GET_ALL_FILES_INFO = 213;
-	const int GET_YOUR_FILE_BACK = 214;
+	const int GET_MY_FILE_BACK = 214;
+	const int REQUEST_TO_RETURN_FILE = 108;
 
 	const int GET_USER_INFO_REQUEST = 205;
 	const int GET_ALL_USERS = 210;
@@ -31,6 +32,8 @@ namespace Protocol
 	const int GET_INFO_ABOUT_GROUPS = 208;
 	const int UPLOAD_FILE_TO_GROUP = 209;
 	const int DELETE_USER_FROM_GROUP = 212;
+	const int EXIT_GROUP = 215;
 
 	const int GET_WORK_END = 211;
+	const int DELETE_VHD = 216;
 }

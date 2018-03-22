@@ -1,9 +1,9 @@
 #include "Server.h"
 
-
 std::condition_variable cv; // Lockes the handle message function until a message has arrived
 queue<ReceivedMessage*> _queRcvMessages; // Hold the messages recieved from the user
 User* Server::currentUser = NULL; // Holds the current user
+string Server::username = " ";
 
 Server::Server()
 {
@@ -159,6 +159,23 @@ void Server::handleReceivedMessages()
 
 		case Protocol::GET_ALL_FILES_INFO:
 			handleGetAllFilesInfo(msg);
+			break;
+
+		case Protocol::GET_MY_FILE_BACK:
+			handleGetFileBack(msg);
+			break;
+
+		case Protocol::REQUEST_TO_RETURN_FILE:
+			handleRequestToReturnFile(msg);
+			break;
+
+		case Protocol::EXIT_GROUP:
+			handleExitGroup(msg);
+			break;
+
+		case Protocol::DELETE_VHD:
+			handleDeleteVHD(msg);
+			break;
 		}	
 	}
 }
@@ -302,6 +319,33 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode, 
 		vec.push_back(groupname);
 	}
 
+	else if (typeCode == Protocol::GET_MY_FILE_BACK)
+	{
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string fileName = Helper::getStringPartFromSocket(clientSocket, length);
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string atUser = Helper::getStringPartFromSocket(clientSocket, length);
+
+		vec.push_back(fileName);
+		vec.push_back(atUser);
+	}
+
+	else if (typeCode == Protocol::REQUEST_TO_RETURN_FILE)
+	{
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string fileName = Helper::getStringPartFromSocket(clientSocket, length);
+
+		vec.push_back(fileName);
+	}
+
+	else if (typeCode == Protocol::EXIT_GROUP)
+	{
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string groupName = Helper::getStringPartFromSocket(clientSocket, length);
+
+		vec.push_back(groupName);
+	}
+
 	return new ReceivedMessage(clientSocket, typeCode, vec, IP);
 }
 
@@ -348,6 +392,15 @@ User* Server::handleSignin(ReceivedMessage* msg)
 			Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_IN_SUCCESS));
 		}
 
+		//string vhdPath = Helper::getCurrentPath() + "\\cloudFile.vhd"; // Converting the string to LPCWSTR
+		//std::wstring stemp = Helper::s2ws(vhdPath);
+		//LPCWSTR result = stemp.c_str();
+
+		//int cloudSize = atoi(db->getUserCloudSize(msg->getValues()[0]).c_str());
+		//CreateVirtualDriver(result, cloudSize * 1000 * 1000); // Multiplying by 1000^2 to turn it into gb
+		connectBlockingSocket();
+
+		this->username = msg->getValues()[0];
 		return new User(msg->getValues()[0], msg->getSock());
 	}
 	else
@@ -392,18 +445,19 @@ void Server::handleGetUserInfo(ReceivedMessage* msg)
 	if (currentUser)
 	{
 		string sendString = "102";
-		sendString += Helper::getPaddedNumber(currentUser->getUserName().length(), 2) + currentUser->getUserName();
+		sendString += Helper::getPaddedNumber(currentUser->getUserName().length(), 2);
+		sendString += MsgEncrypt::Encipher(currentUser->getUserName(), KEY);
 		sendString += Helper::getPaddedNumber(db->getUserEmail(currentUser->getUserName()).length(), 2);
-		sendString += db->getUserEmail(currentUser->getUserName());
+		sendString += MsgEncrypt::Encipher(db->getUserEmail(currentUser->getUserName()), KEY);
 		sendString += Helper::getPaddedNumber(getDriveFreeSpace().length(), 2);
-		sendString += getDriveFreeSpace();
+		sendString += MsgEncrypt::Encipher(getDriveFreeSpace(), KEY);
 
 		Helper::sendData(msg->getSock(), sendString);
 	}
 	else
 	{
 		string sendString = "102";
-		sendString += "04NULL";
+		sendString += MsgEncrypt::Encipher("04NULL", KEY);
 		Helper::sendData(msg->getSock(), sendString);
 	}
 }
@@ -421,14 +475,25 @@ void Server::handleAddUserToGroup(ReceivedMessage* msg)
 void Server::handleGetInfoAboutGroups(ReceivedMessage* msg)
 {
 	vector<pair<string, string>> values = db->getInfoAboutGroups();
-	string sendString = "103" + Helper::getPaddedNumber(to_string(values.size()).length(), 2) + to_string(values.size());
+
+	int amount = 0;
+	for (int i = 0; i < values.size(); i++)
+	{
+		if (values[i].second.find(this->username) != string::npos) // Checks if the user is in the group 
+			amount++;
+	}
+
+	string sendString = "103" + Helper::getPaddedNumber(to_string(amount).length(), 2) + to_string(amount);
 
 	for (int i = 0; i < values.size(); i++)
 	{
-		sendString += Helper::getPaddedNumber(values[i].first.length(), 2);
-		sendString += values[i].first;
-		sendString += Helper::getPaddedNumber(values[i].second.length(), 2);
-		sendString += values[i].second;
+		if (values[i].second.find(this->username) != string::npos) // Checks if the user is in the group 
+		{
+			sendString += Helper::getPaddedNumber(values[i].first.length(), 2);
+			sendString += MsgEncrypt::Encipher(values[i].first, KEY);
+			sendString += Helper::getPaddedNumber(values[i].second.length(), 2);
+			sendString += MsgEncrypt::Encipher(values[i].second, KEY);
+		}
 	}
 
 	Helper::sendData(msg->getSock(), sendString);
@@ -437,7 +502,7 @@ void Server::handleGetInfoAboutGroups(ReceivedMessage* msg)
 string Server::getDriveFreeSpace()
 {
 	CHardDiskManager manager;
-	manager.CheckFreeSpace(L"c:");
+	manager.CheckFreeSpace(L"c:"); // TODO : Change to N
 
 	return to_string(manager.GetTotalNumberOfFreeGBytes());
 }
@@ -494,7 +559,7 @@ void Server::handleGetAllUsersInfo(ReceivedMessage* msg)
 	for (auto user : users)
 	{
 		data += Helper::getPaddedNumber(user.length(), 2);
-		data += user;
+		data += MsgEncrypt::Encipher(user, KEY);
 	}
 
 	Helper::sendData(msg->getSock(), data);
@@ -521,14 +586,86 @@ void Server::handleGetAllFilesInfo(ReceivedMessage* msg)
 	for (auto it : values)
 	{
 		data += Helper::getPaddedNumber(it[0].length(), 3);
-		data += it[0];
+		data += MsgEncrypt::Encipher(it[0], KEY);
 		data += Helper::getPaddedNumber(it[1].length(), 2);
-		data += it[1];
+		data += MsgEncrypt::Encipher(it[1], KEY);
 		data += Helper::getPaddedNumber(it[2].length(), 2);
-		data += it[2];
+		data += MsgEncrypt::Encipher(it[2], KEY);
 		data += Helper::getPaddedNumber(it[3].length(), 2);
-		data += it[3];		
+		data += MsgEncrypt::Encipher(it[3], KEY);
 	}
 
 	Helper::sendData(msg->getSock(), data);
+}
+
+void Server::handleGetFileBack(ReceivedMessage* msg)
+{
+	SOCKADDR_IN target;
+	SOCKET clientSocket;
+
+	string fileName = msg->getValues()[0];
+	string ip = LocalNetFunctions::usernameToIP(msg->getValues()[1]);
+	if (ip.compare("") == 0)
+	{
+		Helper::sendData(msg->getSock(), "1071");
+		return;
+	}
+	
+	target.sin_family = AF_INET; // address family Internet
+	target.sin_port = htons(22223); //Port to connect on
+	target.sin_addr.s_addr = inet_addr(ip.c_str()); //Target IP
+
+	clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //Create socket
+	if (clientSocket == INVALID_SOCKET)
+	{
+		Helper::sendData(msg->getSock(), "1072");
+		return;
+	}
+
+	//Try connecting...
+	if (connect(clientSocket, (SOCKADDR *)&target, sizeof(target)) == SOCKET_ERROR)
+	{
+		Helper::sendData(msg->getSock(), "1072");
+		return;
+	}
+	else
+	{
+		string data = "108";
+		data += Helper::getPaddedNumber(fileName.length(), 2);
+		data += MsgEncrypt::Encipher(fileName, KEY);
+		Helper::sendData(clientSocket, data);
+	}
+}
+
+void Server::handleRequestToReturnFile(ReceivedMessage* msg)
+{
+	// TODO : Change the file name to point to the filepath
+	LocalNetFunctions::sendFileToIp(strdup(msg->getIP().c_str()), strdup(msg->getValues()[0].c_str()));
+}
+
+void Server::handleExitGroup(ReceivedMessage* msg)
+{
+	string groupName = msg->getValues()[0];
+	db->deleteUserFromGroup(this->username, groupName);
+}
+
+void Server::handleDeleteVHD(ReceivedMessage* msg)
+{
+	string vhdPath = Helper::getCurrentPath() + "\\cloudFile.vhd"; // Converting the string to LPCWSTR
+	deleteVirtualHardDriver(vhdPath);
+}
+
+void Server::connectBlockingSocket()
+{
+	SOCKADDR_IN target;
+
+	target.sin_family = AF_INET; // address family Internet
+	target.sin_port = htons(22222); //Port to connect on
+	target.sin_addr.s_addr = inet_addr("127.0.0.1"); //Target IP
+
+	blockingSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //Create socket
+	if (blockingSocket == INVALID_SOCKET)
+		return;
+	if (connect(blockingSocket, (SOCKADDR *)&target, sizeof(target)) == SOCKET_ERROR)
+		return;
 }

@@ -25,6 +25,10 @@ namespace NuvolaWPF.Pages.Login
         public LoginPage()
         {
             WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+
+            AsyncBlockingSocket abs = new AsyncBlockingSocket();
+            Task task = Task.Run((Action)abs.listenForConnection);
+
             InitializeComponent();
         }
 

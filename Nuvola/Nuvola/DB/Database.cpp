@@ -402,6 +402,46 @@ string Database::getUserEmail(string username)
 	return " ";
 }
 
+string Database::getUserCloudSize(string username)
+{
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+		return " ";
+	}
+
+	sqlQuery = "SELECT cloudSize FROM t_users WHERE username = '" + username + "'";
+	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+		return " ";
+	}
+
+	unordered_map<string, vector<string>>::iterator it = results.begin();
+
+	if (it != results.end())
+	{
+		string userEmail = it->second.at(0);
+		results.clear();
+		return userEmail;
+	}
+
+	results.clear();
+	sqlite3_close(db);
+
+	return " ";
+}
+
 void Database::deleteAllNetworkUsers()
 {
 	int rc;

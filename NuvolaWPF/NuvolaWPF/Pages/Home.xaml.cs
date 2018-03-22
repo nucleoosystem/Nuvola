@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,28 @@ namespace NuvolaWPF.Pages
         public Home()
         {
             InitializeComponent();
+
+            ReadLogs();
+        }
+
+        public void ReadLogs()
+        {
+            string line;
+            int linesNumber;
+
+            linesNumber = File.ReadLines("Logs.txt").Count();
+            System.IO.StreamReader file = new System.IO.StreamReader("Logs.txt");
+
+            int count = 1;
+            while ((line = file.ReadLine()) != null && count < 6)
+            {
+                logBox.Text += count.ToString() + ". " + line + Environment.NewLine;  
+                count++;
+            }
+            if (count > 1)
+                logBox.Text = logBox.Text.Remove(logBox.Text.Length - 2);
+
+            file.Close();
         }
     }
 }

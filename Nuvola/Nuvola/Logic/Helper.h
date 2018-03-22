@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <sstream>
 
+#include "../Security/MsgEncrypt.h"
 #include "ReceivedMessage.h"
 
 #pragma comment(lib, "mswsock.lib")
@@ -37,10 +38,15 @@ public:
 	static int getIntPartFromSocket(SOCKET sc, int bytesNum);
 	static string getStringPartFromSocket(SOCKET sc, int bytesNum);
 	static void sendData(SOCKET sc, std::string message);
+
+	static void sendBlockingData(SOCKET sc, std::string message);
+
 	static string getPaddedNumber(int num, int digits);
 	static std::vector<std::string> split(const std::string &text, char sep);
 	static int getFileSize(string path);
 	static string getFileExtension(string fileName);
+	static string getCurrentPath();
+	static std::wstring s2ws(const std::string& s);
 
 private:
 	static char* getPartFromSocket(SOCKET sc, int bytesNum);

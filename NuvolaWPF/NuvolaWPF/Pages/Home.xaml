@@ -8,8 +8,26 @@
     <Grid Style="{StaticResource ContentRoot}">
         <ScrollViewer>
             <StackPanel MinWidth="200">
-                <TextBlock Text="Welcome [Insert Username]" Style="{StaticResource Heading1}"/>
-                <TextBlock Text="Get started by creatin-g groups and uploading files" Style="{StaticResource Heading2}"/>
+                <TextBlock Text="Welcome to Nuvola" Style="{StaticResource Heading1}"/>
+                <Separator></Separator>
+                <TextBlock FontSize="18"  Text="What is it ?" Foreground="Red" Style="{StaticResource Heading2}"/>
+                <TextBlock FontSize="22">
+                    Nuvola is a private cloud solution for home users. It utilizes the available<LineBreak/>
+                    disk space on each local network computer and shares files that were uploaded here<LineBreak/>
+                    to the entire network or to specific groups.<LineBreak/>
+                </TextBlock>
+
+                <TextBlock FontSize="18"  Text="Why was it created ?" Foreground="Red" Style="{StaticResource Heading2}"/>
+                <TextBlock FontSize="22">
+                    Nuvola was created as a school project for my computer science major. It was<LineBreak/>
+                    also a part of my Magshimim final year's project. I worked on this application alone for<LineBreak/>
+                    nearly a year.<LineBreak/>
+                </TextBlock>    
+
+                <TextBlock FontSize="18"  Text="Latest Logs" Foreground="Red" Style="{StaticResource Heading2}"/>
+                <Border BorderBrush="Black" BorderThickness="2" Margin="0,10,0,0" HorizontalAlignment="Stretch">
+                    <TextBlock Name="logBox" FontSize="22"></TextBlock>
+                </Border>
             </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -24,6 +24,9 @@
         <GridSplitter Grid.Column="1"/>
         <ScrollViewer Grid.Column="2 " Margin="{StaticResource SplitRight}">
             <StackPanel>
+                <DockPanel>
+                    <Button Click="leaveBtn_Click" Name="leaveBtn" DockPanel.Dock="Top" Width="50" HorizontalAlignment="Right" fa:Awesome.Content="WindowClose"></Button>
+                </DockPanel>
                 <TextBlock Text="INFORMATION" Style="{StaticResource Heading1}" />
                 <Label Content="Group Name: " Margin="0,10,0,0" FontSize="26"></Label>
                 <Label Name="groupNameLbl" FontSize="26"></Label>
@@ -48,7 +51,7 @@
 
                 <Label Content="Add Users" FontSize="26" Margin="0,20,0,0"></Label>
                 <ComboBox Name="usersCombo" Margin="0,10,0,0" Height="50" FontSize="26"></ComboBox>
-                <Button Name="addBtn" Content="addBtn" Click="addBtn_Click" Margin="0,20,0,0" Width="100" Height="50" HorizontalAlignment="Left"></Button>
+                <Button Name="addBtn" Content="Add User" Click="addBtn_Click" Margin="0,20,0,0" Width="100" Height="50" HorizontalAlignment="Left"></Button>
             </StackPanel>
         </ScrollViewer>
     </Grid>

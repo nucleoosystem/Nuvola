@@ -378,7 +378,7 @@ string LocalNetFunctions::usernameToIP(string username)
 	}
 	else
 	{
-		return "Not Found";
+		return "";
 	}
 }
 

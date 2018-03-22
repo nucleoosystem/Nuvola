@@ -22,6 +22,8 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
+#define KEY "cipher"
+
 class ReceivedMessage;
 class Database;
 
@@ -48,9 +50,12 @@ private:
 	ReceivedMessage* buildRecieveMessage(SOCKET clientSocket, int typeCode, string IP);
 	void addReceivedMessage(ReceivedMessage* msg);
 	void handleReceivedMessages();
+	void connectBlockingSocket();
 
 	int handleUploadFile(ReceivedMessage* msg);
 	void handleGetAllFilesInfo(ReceivedMessage* msg);
+	void handleGetFileBack(ReceivedMessage* msg);
+	void handleRequestToReturnFile(ReceivedMessage* msg);
 
 	bool handleSignup(ReceivedMessage* msg);
 	User* handleSignin(ReceivedMessage* msg);
@@ -63,10 +68,14 @@ private:
 	void handleGetInfoAboutGroups(ReceivedMessage* msg);
 	void handleUploadFileToGroup(ReceivedMessage* msg);
 	void handleDeleteUserFromGroup(ReceivedMessage* msg);
+	void handleExitGroup(ReceivedMessage* msg);
 
 	void handleFinishWork(ReceivedMessage* msg);
+	void handleDeleteVHD(ReceivedMessage* msg);
 
 	mutex _mtxReceivedMessages;
 	Database* db;
 	static User* currentUser;
+	static string username;
+	SOCKET blockingSocket;
 };
