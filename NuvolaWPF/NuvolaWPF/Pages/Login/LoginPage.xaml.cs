@@ -15,6 +15,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net.Sockets;
 
+using ToastNotifications;
+using ToastNotifications.Lifetime;
+using ToastNotifications.Position;
+using ToastNotifications.Messages;
+
 namespace NuvolaWPF.Pages.Login
 {
     /// <summary>
@@ -36,9 +41,9 @@ namespace NuvolaWPF.Pages.Login
         {
             string data = "200";
             data += usernameBox.Text.Length.ToString().PadLeft(2, '0');
-            data += usernameBox.Text;
+            data += SocketHandler.Encipher(usernameBox.Text, "cipher");
             data += passwordBox.Password.Length.ToString().PadLeft(2, '0');
-            data += passwordBox.Password;
+            data += SocketHandler.Encipher(passwordBox.Password, "cipher");
 
             SocketHandler sh = new SocketHandler();
             try
@@ -51,14 +56,21 @@ namespace NuvolaWPF.Pages.Login
                     this.Close();
                     app.Show();
                 }
-
-                //LoadingPage app = new LoadingPage();
-                //this.Close();
-                //app.Show();
+                else
+                {
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowWarning("Wrong username or password");
+                }
             }
-            catch(SocketException)
+            catch (SocketException ex)
             {
-                // TODO: handle socket exception
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
             }
         }
     }

@@ -38,7 +38,6 @@ namespace NuvolaWPF
 
         public void sendData(string data)
         {
-            data = Encipher(data, "cipher");
             ASCIIEncoding asen = new ASCIIEncoding();
             byte[] ba = asen.GetBytes(data);
             s.Send(ba);

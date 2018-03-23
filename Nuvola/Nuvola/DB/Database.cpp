@@ -4,10 +4,15 @@ unordered_map<string, vector<string>> results;
 
 int callback(void* notUsed, int argc, char** argv, char** azCol);
 
-const char* fileName = "DB\\database.db";
+//const char* fileName = "DB\\database.db";
+static char* fileName = "";
 
 Database::Database()
 {
+	string localPath = "\\..\\Nuvola\\DB\\database.db";
+	string fullPath = Helper::getCurrentPath() + localPath;
+	fileName = strdup(fullPath.c_str());
+
 	int rc;
 	sqlite3* db;
 	char *zErrMsg = 0;
@@ -444,6 +449,10 @@ string Database::getUserCloudSize(string username)
 
 void Database::deleteAllNetworkUsers()
 {
+	string localPath = "\\..\\Nuvola\\DB\\database.db";
+	string fullPath = Helper::getCurrentPath() + localPath;
+	fileName = strdup(fullPath.c_str());
+
 	int rc;
 	sqlite3* db;
 	char *zErrMsg = 0;

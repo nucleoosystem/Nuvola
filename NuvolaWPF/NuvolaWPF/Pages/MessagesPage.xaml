@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="NuvolaWPF.Pages.MessagesPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             Loaded="UserControl_Loaded">
+    <Grid Style="{StaticResource ContentRoot}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.5*"/>
+            <ColumnDefinition Width="6"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer Margin="{StaticResource SplitLeft}">
+            <StackPanel>
+                <TextBlock Text="TITLE" Style="{StaticResource Heading1}" />
+                <ListBox Name="titleList" Margin="0,10,0,0" PreviewMouseDown="PlaceholdersListBox_OnPreviewMouseDown"/>
+            </StackPanel>
+        </ScrollViewer>
+        <GridSplitter Grid.Column="1" />
+        <ScrollViewer Grid.Column="2 " Margin="{StaticResource SplitRight}">
+            <StackPanel>
+                <TextBlock Text="INFORMATION" Style="{StaticResource Heading1}" />
+                <TextBlock Name="msgContent" Margin="0,10,0,0" FontSize="20">
+                </TextBlock>
+                <DockPanel Margin="0,20,0,0">
+                    <Button Name="yesBtn" Click="yesBtn_Click" Content="Yes" FontSize="26" HorizontalAlignment="Left"></Button>
+                    <Button Name="noBtn" Click="noBtn_Click" Content="No" FontSize="26" HorizontalAlignment="Left" Margin="10,0,0,0"></Button>
+                </DockPanel>
+                </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

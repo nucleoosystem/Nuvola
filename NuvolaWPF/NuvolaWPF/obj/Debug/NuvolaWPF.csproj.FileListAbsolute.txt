@@ -45,7 +45,6 @@ C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\Nuvol
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Settings\Appearance.baml
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Home.baml
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\SettingsPage.baml
-C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\UploadPage.baml
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\App.baml
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\MainWindow.g.cs
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\DevicesPage.g.cs
@@ -56,7 +55,6 @@ C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\Nuvol
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Settings\Appearance.g.cs
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Home.g.cs
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\SettingsPage.g.cs
-C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\UploadPage.g.cs
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\App.g.cs
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\NuvolaWPF_MarkupCompile.cache
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\NuvolaWPF.g.resources
@@ -70,3 +68,7 @@ C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\Nuvol
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Files\UploadedFiles.g.cs
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Settings\VHDSettings.baml
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Settings\VHDSettings.g.cs
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\MessagesPage.baml
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\MessagesPage.g.cs
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\bin\Debug\ToastNotifications.dll
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\bin\Debug\ToastNotifications.Messages.dll

@@ -267,11 +267,11 @@ vector<string> LocalNetFunctions::getUserInfo(const string& ip)
 	{
 		string data = to_string(Protocol::GET_USER_INFO_REQUEST);
 		data += Helper::getPaddedNumber(Server::getCurrentUsername().length(), 2);
-		data += Server::getCurrentUsername();
+		data += MsgEncrypt::Encipher(Server::getCurrentUsername(), KEY);
 		data += Helper::getPaddedNumber(db->getUserEmail(Server::getCurrentUsername()).length(), 2);
-		data += db->getUserEmail(Server::getCurrentUsername());
+		data += MsgEncrypt::Encipher(db->getUserEmail(Server::getCurrentUsername()), KEY);
 		data += Helper::getPaddedNumber(Server::getDriveFreeSpace().length(), 2);
-		data += Server::getDriveFreeSpace();
+		data += MsgEncrypt::Encipher(Server::getDriveFreeSpace(), KEY);
 
 		Helper::sendData(clientSocket, data);
 		Helper::getMessageTypeCode(clientSocket);
@@ -412,4 +412,40 @@ void LocalNetFunctions::writeToIpsFile(string ip, string username, string email,
 	}
 
 	guiIpsFile.close();
+}
+
+int LocalNetFunctions::askUserForPermission(string ip, string message)
+{
+	SOCKADDR_IN target;
+	SOCKET clientSocket;
+
+	target.sin_family = AF_INET; // address family Internet
+	target.sin_port = htons(22223); //Port to connect on
+	target.sin_addr.s_addr = inet_addr(ip.c_str()); //Target IP
+
+	clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //Create socket
+	if (clientSocket == INVALID_SOCKET)
+	{
+		return -1;
+	}
+
+	//Try connecting...
+	if (connect(clientSocket, (SOCKADDR *)&target, sizeof(target)) == SOCKET_ERROR)
+	{
+		return -1;
+	}
+	else
+	{
+		string data = to_string(Protocol::ASK_PERMIT);
+		data += Helper::getPaddedNumber(message.length(), 3);
+		data += MsgEncrypt::Encipher(message, "cipher");
+		Helper::sendData(clientSocket, data);
+		
+		int typeCode = Helper::getMessageTypeCode(clientSocket);
+		int answer = Helper::getIntPartFromSocket(clientSocket, 1);
+		
+		return answer;
+	}
+
+	return -1;
 }

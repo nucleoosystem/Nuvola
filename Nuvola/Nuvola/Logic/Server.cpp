@@ -176,6 +176,10 @@ void Server::handleReceivedMessages()
 		case Protocol::DELETE_VHD:
 			handleDeleteVHD(msg);
 			break;
+
+		case Protocol::ASK_PERMIT:
+			handleAskPermission(msg);
+			break;
 		}	
 	}
 }
@@ -346,6 +350,14 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode, 
 		vec.push_back(groupName);
 	}
 
+	else if (typeCode == Protocol::ASK_PERMIT)
+	{
+		length = Helper::getIntPartFromSocket(clientSocket, 3);
+		string message = Helper::getStringPartFromSocket(clientSocket, length);
+
+		vec.push_back(message);
+	}
+
 	return new ReceivedMessage(clientSocket, typeCode, vec, IP);
 }
 
@@ -469,7 +481,23 @@ void Server::handleCreateNewGroup(ReceivedMessage* msg)
 
 void Server::handleAddUserToGroup(ReceivedMessage* msg)
 {
-	db->addUserToGroup(msg->getValues()[1], msg->getValues()[0]);
+	string ip = LocalNetFunctions::usernameToIP(msg->getValues()[0]);
+	string message = "You are invited to join the group " + msg->getValues()[1];
+	
+	int answer = LocalNetFunctions::askUserForPermission(ip, message);
+	if (answer == 1)
+	{
+		db->addUserToGroup(msg->getValues()[1], msg->getValues()[0]);
+	}
+	else
+	{
+		string result = "User refused to join the group";
+		string data = to_string(Protocol::GENERAL_MESSAGE);
+		data += Helper::getPaddedNumber(result.length(), 3);
+		data += result;
+
+		Helper::sendBlockingData(blockingSocket, data);
+	}
 }
 
 void Server::handleGetInfoAboutGroups(ReceivedMessage* msg)
@@ -667,5 +695,22 @@ void Server::connectBlockingSocket()
 	if (blockingSocket == INVALID_SOCKET)
 		return;
 	if (connect(blockingSocket, (SOCKADDR *)&target, sizeof(target)) == SOCKET_ERROR)
-		return;
+	{
+		cout << "Error connecting blocking socket." << endl;
+	}
+}
+
+void Server::handleAskPermission(ReceivedMessage* msg)
+{
+	string data = to_string(Protocol::ADD_USER_TO_GROUP);
+	string message = msg->getValues()[0];
+	data += Helper::getPaddedNumber(message.length(), 3);
+	data += message;
+	Helper::sendBlockingData(blockingSocket, data);
+
+	int typeCode = Helper::getMessageTypeCode(blockingSocket);
+	int answer = Helper::getIntPartFromSocket(blockingSocket, 1);
+	data = to_string(typeCode) + to_string(answer);
+
+	Helper::sendData(msg->getSock(), data);
 }

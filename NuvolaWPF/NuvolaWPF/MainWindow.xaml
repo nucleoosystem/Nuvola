@@ -18,9 +18,9 @@
                 <mui:Link DisplayName="Cloud's Files" Source="/Pages/Files/UploadedFiles.xaml" />
             </mui:LinkGroup.Links>
         </mui:LinkGroup>
-        <mui:LinkGroup DisplayName="upload">
+        <mui:LinkGroup DisplayName="messages">
             <mui:LinkGroup.Links>
-                <mui:Link DisplayName="upload" Source="/Pages/UploadPage.xaml" />
+                <mui:Link DisplayName="messages" Source="/Pages/MessagesPage.xaml" />
             </mui:LinkGroup.Links>
         </mui:LinkGroup>
         <mui:LinkGroup DisplayName="groups">

@@ -49,6 +49,7 @@ public:
 	static string IPToUsername(string ip);
 	static void addUserToList(string username, string IP);
 	static void writeToIpsFile(string ip, string username, string email, string cloudSize);
+	static int askUserForPermission(string ip, string message);
 
 private:
 	static std::vector<std::pair<std::string, std::string>> getLocalIpAddress();

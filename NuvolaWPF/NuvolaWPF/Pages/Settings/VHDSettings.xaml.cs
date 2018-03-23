@@ -14,6 +14,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using ToastNotifications;
+using ToastNotifications.Lifetime;
+using ToastNotifications.Position;
+using ToastNotifications.Messages;
+
 namespace NuvolaWPF.Pages.Settings
 {
     /// <summary>
@@ -36,7 +41,13 @@ namespace NuvolaWPF.Pages.Settings
             }
             catch(SocketException ex)
             {
-                MessageBox.Show(ex.Data.ToString());
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
+            }
+            catch(Exception ex)
+            {
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
             }
         }
 

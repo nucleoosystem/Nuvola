@@ -15,6 +15,11 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Net.Sockets;
 
+using ToastNotifications;
+using ToastNotifications.Lifetime;
+using ToastNotifications.Position;
+using ToastNotifications.Messages;
+
 namespace NuvolaWPF.Pages
 {
     /// <summary>
@@ -85,13 +90,15 @@ namespace NuvolaWPF.Pages
                 // Open document
                 fileName = dlg.FileName;
 
-                string data = "203" + fileName.Length.ToString().PadLeft(3, '0') + fileName;
+                string data = "203" + fileName.Length.ToString().PadLeft(3, '0');
+                data += SocketHandler.Encipher(fileName, "cipher");
                 data += "0"; // No encryption   
                 data += "01" + "1"; // One user
 
                 if (ipLbl.Content != null)
                 {
-                    data += ipLbl.Content.ToString().Length.ToString().PadLeft(2, '0') + ipLbl.Content.ToString();
+                    data += ipLbl.Content.ToString().Length.ToString().PadLeft(2, '0');
+                    data += SocketHandler.Encipher(ipLbl.Content.ToString(), "cipher"); 
                 }
 
                 SocketHandler sh = new SocketHandler();
@@ -99,9 +106,15 @@ namespace NuvolaWPF.Pages
                 {
                     sh.sendData(data);
                 }
-                catch (SocketException)
+                catch (SocketException ex)
                 {
-
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
                 }
             }
         }

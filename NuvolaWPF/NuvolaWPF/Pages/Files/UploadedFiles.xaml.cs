@@ -14,6 +14,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net.Sockets;
 
+using ToastNotifications;
+using ToastNotifications.Lifetime;
+using ToastNotifications.Position;
+using ToastNotifications.Messages;
+
 namespace NuvolaWPF.Pages.Files
 {
     /// <summary>
@@ -66,9 +71,15 @@ namespace NuvolaWPF.Pages.Files
                     AddRowToGrid(fileName, fileType, fileLoc, fileSize);
                 }
             }
-            catch (SocketException)
+            catch (SocketException ex)
             {
-
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
             }
         }
 
@@ -97,9 +108,15 @@ namespace NuvolaWPF.Pages.Files
             {
                 sh.sendData(data);
             }
-            catch(SocketException ex)
+            catch (SocketException ex)
             {
-                MessageBox.Show(ex.Data.ToString());
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
             }
         }
     }

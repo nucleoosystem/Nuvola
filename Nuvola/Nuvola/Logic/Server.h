@@ -73,6 +73,8 @@ private:
 	void handleFinishWork(ReceivedMessage* msg);
 	void handleDeleteVHD(ReceivedMessage* msg);
 
+	void handleAskPermission(ReceivedMessage* msg);
+
 	mutex _mtxReceivedMessages;
 	Database* db;
 	static User* currentUser;

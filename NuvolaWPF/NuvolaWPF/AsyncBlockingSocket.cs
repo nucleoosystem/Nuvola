@@ -7,14 +7,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
+using ToastNotifications;
+using ToastNotifications.Lifetime;
+using ToastNotifications.Position;
+using ToastNotifications.Messages;
+
 namespace NuvolaWPF
 {
     class AsyncBlockingSocket
     {
-        static Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
+        public static Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        Notifier notifier;
+        
         public AsyncBlockingSocket()
         {
+            
         }
 
         public void listenToServer()
@@ -22,7 +29,7 @@ namespace NuvolaWPF
             Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
             IPEndPoint ipe = new IPEndPoint(ipAddress, 22222);
-
+            
             try
             {
                 listener.Bind(ipe);
@@ -48,29 +55,85 @@ namespace NuvolaWPF
 
         public void listenForConnection()
         {
+            notifier = initNotifier();
+            /*App.Current.Dispatcher.Invoke(() =>
+            {
+                string message = "You were invited to the group";
+                notifier.ShowInformation(message);
+                notifier.ShowSuccess(message);
+                notifier.ShowWarning(message);
+                notifier.ShowError(message);
+            });*/
+
             listenToServer();
             while(true)
             {
                 int msgCode = getMsgCode();
 
-                switch(msgCode)
+                App.Current.Dispatcher.Invoke(() =>
                 {
-                    default:
-                        MessageBox.Show("Unknown Message Received: " + msgCode.ToString());
-                        break;
-                }
+                    switch(msgCode)
+                    {
+                        case 207:
+                            handleInviteToGroup();
+                            break;
+                        case 500:
+                            notifier.ShowInformation(recvData(3));
+                            break;
+                        default:
+                            MessageBox.Show("Unknown Message Received: " + msgCode.ToString());
+                            break;
+                    }
+                 });
             }
         }
 
-        public string recvData()
+        public static void sendData(string data)
         {
-            byte[] ba = new byte[2];
+            data = Encipher(data, "cipher");
+            ASCIIEncoding asen = new ASCIIEncoding();
+            byte[] ba = asen.GetBytes(data);
+            s.Send(ba);
+        }
+
+        public void handleInviteToGroup()
+        {
+            string message = recvData(3);
+            Pages.MessagesPage.msgs.Add("Invite To Group", message);
+            notifier.ShowInformation("A New invite arrived");
+        }
+
+        public static Notifier initNotifier()
+        {
+            Notifier notifier = new Notifier(cfg =>
+            {
+                cfg.PositionProvider = new WindowPositionProvider(
+                    parentWindow: Application.Current.MainWindow,
+                    corner: Corner.BottomRight,
+                    offsetX: 10,
+                    offsetY: 10);
+
+                cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
+                    notificationLifetime: TimeSpan.FromSeconds(8),
+                    maximumNotificationCount: MaximumNotificationCount.FromCount(4));
+
+                cfg.Dispatcher = Application.Current.Dispatcher;
+            });
+
+            return notifier;
+        }
+
+        public string recvData(int length)
+        {
+            byte[] ba = new byte[length];
             s.Receive(ba);
             string size = System.Text.Encoding.Default.GetString(ba);
 
             byte[] msg = new byte[int.Parse(size)];
             s.Receive(msg);
-            return Decipher(System.Text.Encoding.Default.GetString(msg), "cipher");
+            return System.Text.Encoding.Default.GetString(msg);
+
+            //return Decipher(System.Text.Encoding.Default.GetString(msg), "cipher");
         }
 
         public int getMsgCode()

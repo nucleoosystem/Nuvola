@@ -1,0 +1,137 @@
+﻿Build started 23/03/2018 19:33:37.
+     1>Project "C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Nuvola\Nuvola.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt DB\Database.cpp Logic\CreateVirtualDriver.cpp Logic\Group.cpp Logic\HardDiskManager.cpp Logic\Helper.cpp Logic\ReceivedMessage.cpp Logic\Server.cpp Logic\Source.cpp Logic\User.cpp Logic\Validator.cpp Networking\LocalNetFunctions.cpp Networking\WComm.cpp Networking\WSAInitializer.cpp Security\Crypt.cpp Security\FileEncrypt.cpp Security\MsgEncrypt.cpp
+         Database.cpp
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\CreateVirtualDriver.h(1): warning C4005: 'WINVER' : macro redefinition
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\shared\sdkddkver.h(215) : see previous definition of 'WINVER'
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\Helper.h(68): warning C4005: 'TRACE' : macro redefinition
+                 c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\Helper.h(67) : see previous definition of 'TRACE'
+     1>DB\Database.cpp(355): warning C4018: '<' : signed/unsigned mismatch
+     1>DB\Database.cpp(501): warning C4018: '<' : signed/unsigned mismatch
+         CreateVirtualDriver.cpp
+     1>Logic\CreateVirtualDriver.cpp(136): warning C4018: '<' : signed/unsigned mismatch
+         Group.cpp
+         HardDiskManager.cpp
+         Helper.cpp
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\Helper.h(68): warning C4005: 'TRACE' : macro redefinition
+                 c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\Helper.h(67) : see previous definition of 'TRACE'
+         ReceivedMessage.cpp
+         Server.cpp
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\CreateVirtualDriver.h(1): warning C4005: 'WINVER' : macro redefinition
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\shared\sdkddkver.h(215) : see previous definition of 'WINVER'
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\Helper.h(68): warning C4005: 'TRACE' : macro redefinition
+                 c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\Helper.h(67) : see previous definition of 'TRACE'
+     1>Logic\Server.cpp(89): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1868) : see declaration of 'inet_ntoa'
+     1>Logic\Server.cpp(82): warning C4101: 'newConnection' : unreferenced local variable
+     1>Logic\Server.cpp(436): warning C4018: '<' : signed/unsigned mismatch
+     1>Logic\Server.cpp(441): warning C4996: 'strdup': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _strdup. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\string.h(245) : see declaration of 'strdup'
+     1>Logic\Server.cpp(508): warning C4018: '<' : signed/unsigned mismatch
+     1>Logic\Server.cpp(516): warning C4018: '<' : signed/unsigned mismatch
+     1>Logic\Server.cpp(644): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : see declaration of 'inet_addr'
+     1>Logic\Server.cpp(671): warning C4996: 'strdup': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _strdup. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\string.h(245) : see declaration of 'strdup'
+     1>Logic\Server.cpp(692): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : see declaration of 'inet_addr'
+         Source.cpp
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\CreateVirtualDriver.h(1): warning C4005: 'WINVER' : macro redefinition
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\shared\sdkddkver.h(215) : see previous definition of 'WINVER'
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\Helper.h(68): warning C4005: 'TRACE' : macro redefinition
+                 c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\Helper.h(67) : see previous definition of 'TRACE'
+         User.cpp
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\Helper.h(68): warning C4005: 'TRACE' : macro redefinition
+                 c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\Helper.h(67) : see previous definition of 'TRACE'
+         Validator.cpp
+         LocalNetFunctions.cpp
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\networking\../Logic/Helper.h(68): warning C4005: 'TRACE' : macro redefinition
+                 c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\networking\../Logic/Helper.h(67) : see previous definition of 'TRACE'
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\logic\CreateVirtualDriver.h(1): warning C4005: 'WINVER' : macro redefinition
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\shared\sdkddkver.h(215) : see previous definition of 'WINVER'
+     1>Networking\LocalNetFunctions.cpp(100): warning C4996: 'mbstowcs': This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\stdlib.h(528) : see declaration of 'mbstowcs'
+     1>Networking\LocalNetFunctions.cpp(168): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\string.h(195) : see declaration of 'strncpy'
+     1>Networking\LocalNetFunctions.cpp(170): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\string.h(195) : see declaration of 'strncpy'
+     1>Networking\LocalNetFunctions.cpp(207): warning C4018: '<' : signed/unsigned mismatch
+     1>Networking\LocalNetFunctions.cpp(224): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : see declaration of 'inet_addr'
+     1>Networking\LocalNetFunctions.cpp(253): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : see declaration of 'inet_addr'
+     1>Networking\LocalNetFunctions.cpp(309): warning C4996: 'strdup': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _strdup. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\string.h(245) : see declaration of 'strdup'
+     1>Networking\LocalNetFunctions.cpp(323): warning C4996: 'strdup': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _strdup. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\string.h(245) : see declaration of 'strdup'
+     1>Networking\LocalNetFunctions.cpp(327): warning C4996: 'strdup': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _strdup. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\string.h(245) : see declaration of 'strdup'
+     1>Networking\LocalNetFunctions.cpp(424): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : see declaration of 'inet_addr'
+         WComm.cpp
+     1>Networking\WComm.cpp(40): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : see declaration of 'inet_addr'
+     1>Networking\WComm.cpp(55): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : see declaration of 'inet_addr'
+     1>Networking\WComm.cpp(109): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\stdio.h(211) : see declaration of 'fopen'
+     1>Networking\WComm.cpp(160): warning C4996: 'itoa': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _itoa. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\stdlib.h(937) : see declaration of 'itoa'
+     1>Networking\WComm.cpp(170): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\stdio.h(211) : see declaration of 'fopen'
+         WSAInitializer.cpp
+         Crypt.cpp
+         _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\security\Crypt.h(20): warning C4005: 'STATUS_INVALID_PARAMETER' : macro redefinition
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winnt.h(2236) : see previous definition of 'STATUS_INVALID_PARAMETER'
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\security\Crypt.h(24): warning C4005: 'STATUS_ENTRYPOINT_NOT_FOUND' : macro redefinition
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winnt.h(2255) : see previous definition of 'STATUS_ENTRYPOINT_NOT_FOUND'
+         FileEncrypt.cpp
+         _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\security\Crypt.h(20): warning C4005: 'STATUS_INVALID_PARAMETER' : macro redefinition
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winnt.h(2236) : see previous definition of 'STATUS_INVALID_PARAMETER'
+     1>c:\users\shakednissanov\documents\schoolwork\mywork\cloudproject\nuvola\nuvola\security\Crypt.h(24): warning C4005: 'STATUS_ENTRYPOINT_NOT_FOUND' : macro redefinition
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winnt.h(2255) : see previous definition of 'STATUS_ENTRYPOINT_NOT_FOUND'
+         MsgEncrypt.cpp
+     1>Security\MsgEncrypt.cpp(24): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TC /analyze- /errorReport:prompt DB\sqlite3.c
+         sqlite3.c
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Release\Nuvola.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Release\Nuvola.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Release\Nuvola.lib" /MACHINE:X86 /SAFESEH Release\Database.obj
+         Release\sqlite3.obj
+         Release\CreateVirtualDriver.obj
+         Release\Group.obj
+         Release\HardDiskManager.obj
+         Release\Helper.obj
+         Release\ReceivedMessage.obj
+         Release\Server.obj
+         Release\Source.obj
+         Release\User.obj
+         Release\Validator.obj
+         Release\LocalNetFunctions.obj
+         Release\WComm.obj
+         Release\WSAInitializer.obj
+         Release\Crypt.obj
+         Release\FileEncrypt.obj
+         Release\MsgEncrypt.obj
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptEncrypt@40
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptOpenAlgorithmProvider@16
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptDestroyHash@4
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptHashData@16
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptFinishHash@16
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptGenerateSymmetricKey@28
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptCloseAlgorithmProvider@8
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptDecrypt@40
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptFreeBuffer@4
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptSetProperty@20
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptDestroyKey@4
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptEnumRegisteredProviders@8
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptCreateHash@28
+     1>Crypt.obj : error LNK2001: unresolved external symbol _BCryptGetProperty@24
+     1>C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Release\Nuvola.exe : fatal error LNK1120: 14 unresolved externals
+     1>Done Building Project "C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Nuvola\Nuvola.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:16.27

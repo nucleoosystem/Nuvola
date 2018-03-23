@@ -36,4 +36,9 @@ namespace Protocol
 
 	const int GET_WORK_END = 211;
 	const int DELETE_VHD = 216;
+
+	/////////////////////////////////////////////////////////////
+
+	const int ASK_PERMIT = 300;
+	const int GENERAL_MESSAGE = 500;
 }

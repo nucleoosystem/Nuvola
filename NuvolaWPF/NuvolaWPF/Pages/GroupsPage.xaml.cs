@@ -14,6 +14,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net.Sockets;
 
+using ToastNotifications;
+using ToastNotifications.Lifetime;
+using ToastNotifications.Position;
+using ToastNotifications.Messages;
+
 namespace NuvolaWPF.Pages
 {
     /// <summary>
@@ -81,9 +86,15 @@ namespace NuvolaWPF.Pages
                     }
                 }
             }
-            catch(SocketException)
+            catch (SocketException ex)
             {
-
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
             }
         }
 
@@ -117,9 +128,15 @@ namespace NuvolaWPF.Pages
                         usersCombo.Items.Add(username);
                     }
                 }
-                catch(SocketException)
+                catch (SocketException ex)
                 {
-                    // TODO : Handle exception
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
                 }
             }
         }
@@ -153,19 +170,27 @@ namespace NuvolaWPF.Pages
             }
 
             string data = "209";
+            if (groupNameLbl.Content == null)
+                return;
             data += groupNameLbl.Content.ToString().Length.ToString().PadLeft(2, '0');
-            data += groupNameLbl.Content.ToString();
+            data += SocketHandler.Encipher(groupNameLbl.Content.ToString(), "cipher");
             data += fileName.Length.ToString().PadLeft(3, '0');
-            data += fileName;
+            data += SocketHandler.Encipher(fileName, "cipher");
 
             SocketHandler sh = new SocketHandler();
             try
             {
                 sh.sendData(data);
             }
-            catch(SocketException)
+            catch (SocketException ex)
             {
-                // TODO : Handle Socket Exception
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
             }
         }
 
@@ -178,9 +203,9 @@ namespace NuvolaWPF.Pages
 
                 string data = "207";
                 data += username.Length.ToString().PadLeft(2, '0');
-                data += username;
+                data += SocketHandler.Encipher(username, "cipher");
                 data += groupName.Length.ToString().PadLeft(2, '0');
-                data += groupName;
+                data += SocketHandler.Encipher(groupName, "cipher");
 
                 SocketHandler sh = new SocketHandler();
                 try
@@ -189,7 +214,13 @@ namespace NuvolaWPF.Pages
                 }
                 catch (SocketException ex)
                 {
-                    MessageBox.Show(ex.Data.ToString());
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
                 }
 
                 GetInfoAboutGroups();
@@ -205,18 +236,24 @@ namespace NuvolaWPF.Pages
 
             string data = "212";
             data += username.Length.ToString().PadLeft(2, '0');
-            data += username;
+            data += SocketHandler.Encipher(username, "cipher"); ;
             data += groupName.Length.ToString().PadLeft(2, '0');
-            data += groupName;
+            data += SocketHandler.Encipher(groupName, "cipher"); ;
 
             SocketHandler sh = new SocketHandler();
             try
             {
                 sh.sendData(data);
             }
-            catch(SocketException ex)
+            catch (SocketException ex)
             {
-                MessageBox.Show(ex.Data.ToString());
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
             }
 
             GetInfoAboutGroups();
@@ -250,9 +287,15 @@ namespace NuvolaWPF.Pages
                     usersCombo.Items.Add(username);
                 }
             }
-            catch (SocketException)
+            catch (SocketException ex)
             {
-                // TODO : Handle exception
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError(ex.ToString());
             }
         }
 
@@ -264,7 +307,7 @@ namespace NuvolaWPF.Pages
 
                 string data = "215";
                 data += groupName.Length.ToString().PadLeft(2, '0');
-                data += groupName;
+                data += SocketHandler.Encipher(groupName, "cipher");
 
                 SocketHandler sh = new SocketHandler();
                 try
@@ -273,7 +316,13 @@ namespace NuvolaWPF.Pages
                 }
                 catch (SocketException ex)
                 {
-                    MessageBox.Show(ex.Data.ToString());
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
                 }
 
                 GetInfoAboutGroups();
