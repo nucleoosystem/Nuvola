@@ -315,13 +315,13 @@ int LocalNetFunctions::sendFileToIp(char* ip, char* path)
 	WComm w;
 	string rec = " ";
 	const int port = 8888;
-
+	
 	// Connect To Server
 	w.connectServer(ip, port);
 
 	// Sending File
 	w.sendData("FileSend");	w.recvData(strdup(rec.c_str()), 32);
-	w.fileSend(path);
+	w.fileSend(path, blockingSocket);
 
 	// Send Close Connection Signal
 	w.sendData("EndConnection"); w.recvData(strdup(rec.c_str()), 32);
@@ -448,4 +448,38 @@ int LocalNetFunctions::askUserForPermission(string ip, string message)
 	}
 
 	return -1;
+}
+
+void LocalNetFunctions::sendUserInfoAboutGroup(string ip, string groupName, string users)
+{
+	SOCKADDR_IN target;
+	SOCKET clientSocket;
+
+	target.sin_family = AF_INET; // address family Internet
+	target.sin_port = htons(22223); //Port to connect on
+	target.sin_addr.s_addr = inet_addr(ip.c_str()); //Target IP
+
+	clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //Create socket
+	if (clientSocket == INVALID_SOCKET)
+	{
+		cout << "Error creating socket on line: " << __LINE__ << endl;
+		return;
+	}
+
+	//Try connecting...
+	if (connect(clientSocket, (SOCKADDR *)&target, sizeof(target)) == SOCKET_ERROR)
+	{
+		cout << "Error creating socket on line: " << __LINE__ << endl;
+		return;
+	}
+	else
+	{
+		string data = to_string(Protocol::NEW_GROUP_INFO);
+		data += Helper::getPaddedNumber(groupName.length(), 2);
+		data += MsgEncrypt::Encipher(groupName, "cipher");
+		data += Helper::getPaddedNumber(users.length(), 2);
+		data += MsgEncrypt::Encipher(users, "cipher");
+
+		Helper::sendData(clientSocket, data);
+	}
 }

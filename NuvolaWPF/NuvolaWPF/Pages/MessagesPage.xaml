@@ -17,7 +17,7 @@
         <ScrollViewer Margin="{StaticResource SplitLeft}">
             <StackPanel>
                 <TextBlock Text="TITLE" Style="{StaticResource Heading1}" />
-                <ListBox Name="titleList" Margin="0,10,0,0" PreviewMouseDown="PlaceholdersListBox_OnPreviewMouseDown"/>
+                <ListBox Name="titleList" Margin="0,10,0,0" SelectionChanged="titleList_SelectionChanged"/>
             </StackPanel>
         </ScrollViewer>
         <GridSplitter Grid.Column="1" />

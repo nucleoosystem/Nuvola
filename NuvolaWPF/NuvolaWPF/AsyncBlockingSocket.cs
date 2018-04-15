@@ -11,6 +11,7 @@ using ToastNotifications;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Position;
 using ToastNotifications.Messages;
+using ToastNotifications.Messages.Core;
 
 namespace NuvolaWPF
 {
@@ -18,10 +19,10 @@ namespace NuvolaWPF
     {
         public static Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         Notifier notifier;
+        static Notifier precentageNotifier;
         
         public AsyncBlockingSocket()
         {
-            
         }
 
         public void listenToServer()
@@ -77,8 +78,14 @@ namespace NuvolaWPF
                         case 207:
                             handleInviteToGroup();
                             break;
+                        case 203:
+                            handleUploadFile();
+                            break;
+                        case 302:
+                            handleFileUploadPercent();
+                            break;
                         case 500:
-                            notifier.ShowInformation(recvData(3));
+                            handleGeneralMessage();
                             break;
                         default:
                             MessageBox.Show("Unknown Message Received: " + msgCode.ToString());
@@ -90,17 +97,60 @@ namespace NuvolaWPF
 
         public static void sendData(string data)
         {
-            data = Encipher(data, "cipher");
             ASCIIEncoding asen = new ASCIIEncoding();
             byte[] ba = asen.GetBytes(data);
             s.Send(ba);
         }
 
+        public void handleFileUploadPercent()
+        {
+            string fileName = recvData(3);
+            int percentage = getMsgCode(); // The legnth of the percentage is 3 so we can use the getMsgCode function
+            precentageNotifier = initPrecentageNotifier();
+            precentageNotifier.ShowInformation("File Upload: " + percentage.ToString() + "%");
+        }
+
         public void handleInviteToGroup()
         {
             string message = recvData(3);
-            Pages.MessagesPage.msgs.Add("Invite To Group", message);
-            notifier.ShowInformation("A New invite arrived");
+            Pages.MessagesPage.list.Add(new Tuple<string, string>("Group Invite", message));
+            notifier.ShowInformation("A new invite arrived");
+        }
+
+        public void handleUploadFile()
+        {
+            string message = recvData(3);
+            Pages.MessagesPage.list.Add(new Tuple<string, string>("Request To Send File", message));
+            notifier.ShowInformation("Someone wants to send you a file");
+        }
+
+        public void handleGeneralMessage()
+        {
+            string message = recvData(3);
+            Pages.MessagesPage.list.Add(new Tuple<string, string>("General Message", message));
+            notifier.ShowInformation("A New Message arrived");
+        }
+
+        public static Notifier initPrecentageNotifier()
+        {
+            Notifier notifier = new Notifier(cfg =>
+            {
+                cfg.DisplayOptions.TopMost = true;
+
+                cfg.PositionProvider = new WindowPositionProvider(
+                    parentWindow: Application.Current.MainWindow,
+                    corner: Corner.BottomRight,
+                    offsetX: 10,
+                    offsetY: 10);
+
+                cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
+                    notificationLifetime: TimeSpan.FromSeconds(1),
+                    maximumNotificationCount: MaximumNotificationCount.FromCount(1));
+
+                cfg.Dispatcher = Application.Current.Dispatcher;
+            });
+
+            return notifier;
         }
 
         public static Notifier initNotifier()
@@ -131,9 +181,8 @@ namespace NuvolaWPF
 
             byte[] msg = new byte[int.Parse(size)];
             s.Receive(msg);
-            return System.Text.Encoding.Default.GetString(msg);
 
-            //return Decipher(System.Text.Encoding.Default.GetString(msg), "cipher");
+            return Decipher(System.Text.Encoding.Default.GetString(msg), "cipher");
         }
 
         public int getMsgCode()

@@ -9,7 +9,15 @@
         <ScrollViewer>
             <StackPanel MinWidth="200">
                 <TextBlock Text="ABOUT" Style="{StaticResource Heading2}" />
-                <TextBlock Text="TODO: provide information about the software" Margin="0,0,0,8" TextWrapping="Wrap" />
+                <TextBlock Margin="0,0,0,8" TextWrapping="Wrap">
+                    Nuvola is a private cloud solution for home users. It utilizes the available<LineBreak/>
+                    disk space on each local network computer and shares files that were uploaded here<LineBreak/>
+                    to the entire network or to specific groups. <LineBreak /><LineBreak/>
+                    
+                    Nuvola was created as a school project for my computer science major. It was<LineBreak/>
+                    also a part of my Magshimim final year's project. I worked on this application alone for<LineBreak/>
+                    nearly a year.
+                </TextBlock>
             </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -4,6 +4,7 @@ std::condition_variable cv; // Lockes the handle message function until a messag
 queue<ReceivedMessage*> _queRcvMessages; // Hold the messages recieved from the user
 User* Server::currentUser = NULL; // Holds the current user
 string Server::username = " ";
+SOCKET blockingSocket = INVALID_SOCKET;
 
 Server::Server()
 {
@@ -122,8 +123,11 @@ void Server::handleReceivedMessages()
 			break;
 
 		case Protocol::UPLOAD_FILE_REQUEST:
-			handleUploadFile(msg);
+		{
+			thread sendFileThread(&Server::handleUploadFile, this, msg);
+			sendFileThread.detach();
 			break;
+		}
 
 		case Protocol::GET_USER_INFO_REQUEST:
 			handleGetUserInfo(msg);
@@ -134,8 +138,11 @@ void Server::handleReceivedMessages()
 			break;
 
 		case Protocol::ADD_USER_TO_GROUP:
-			handleAddUserToGroup(msg);
+		{
+			thread addUserThread(&Server::handleAddUserToGroup, this, msg);
+			addUserThread.detach();
 			break;
+		}
 
 		case Protocol::GET_INFO_ABOUT_GROUPS:
 			handleGetInfoAboutGroups(msg);
@@ -175,6 +182,10 @@ void Server::handleReceivedMessages()
 
 		case Protocol::DELETE_VHD:
 			handleDeleteVHD(msg);
+			break;
+
+		case Protocol::NEW_GROUP_INFO:
+			handleInsertNewGroup(msg);
 			break;
 
 		case Protocol::ASK_PERMIT:
@@ -358,6 +369,17 @@ ReceivedMessage* Server::buildRecieveMessage(SOCKET clientSocket, int typeCode, 
 		vec.push_back(message);
 	}
 
+
+	else if (typeCode == Protocol::NEW_GROUP_INFO)
+	{
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string groupName = Helper::getStringPartFromSocket(clientSocket, length);
+		length = Helper::getIntPartFromSocket(clientSocket, 2);
+		string users = Helper::getStringPartFromSocket(clientSocket, length);
+
+		vec.push_back(groupName);
+		vec.push_back(users);
+	}
 	return new ReceivedMessage(clientSocket, typeCode, vec, IP);
 }
 
@@ -436,13 +458,30 @@ int Server::handleUploadFile(ReceivedMessage* msg)
 	for (int i = 2; i < msg->getValues().size(); i++)
 		ips.push_back(msg->getValues()[i]);
 
-	if (ips.size() == 1)
+	string ip = ips[0]; // The computer that we send the file to
+	string fileName = Helper::split(filePath, '\\').back();
+	string message = username + " Wants to send you the file: " + fileName;
+
+	int answer = LocalNetFunctions::askUserForPermission(ip, message);
+	if (answer == 1)
 	{
-		LocalNetFunctions::sendFileToIp(strdup(ips.at(0).c_str()), strdup(filePath.c_str()));
+		if (ips.size() == 1)
+		{
+			LocalNetFunctions::sendFileToIp(strdup(ips.at(0).c_str()), strdup(filePath.c_str()));
+		}
+		else
+		{
+			LocalNetFunctions::uploadFileToGroup(filePath, encrypt, ips);
+		}
 	}
-	else
+		else
 	{
-		LocalNetFunctions::uploadFileToGroup(filePath, encrypt, ips);
+		string result = MsgEncrypt::Encipher("User refused to accept the file", "cipher");
+		string data = to_string(Protocol::GENERAL_MESSAGE);
+		data += Helper::getPaddedNumber(result.length(), 3);
+		data += result;
+
+		Helper::sendBlockingData(blockingSocket, data);
 	}
 
 	return 0;
@@ -487,11 +526,20 @@ void Server::handleAddUserToGroup(ReceivedMessage* msg)
 	int answer = LocalNetFunctions::askUserForPermission(ip, message);
 	if (answer == 1)
 	{
-		db->addUserToGroup(msg->getValues()[1], msg->getValues()[0]);
+		string users;
+		string groupName = msg->getValues()[1];
+		for (pair<string, string> group : db->getInfoAboutGroups())
+		{
+			if (group.first == groupName)
+				users = group.second;
+		}
+		LocalNetFunctions::sendUserInfoAboutGroup(ip, groupName, users); // Sending the user info about the group
+
+		db->addUserToGroup(msg->getValues()[1], msg->getValues()[0]); // Adding the user to our database
 	}
 	else
 	{
-		string result = "User refused to join the group";
+		string result = MsgEncrypt::Encipher("User refused to join the group", "cipher");
 		string data = to_string(Protocol::GENERAL_MESSAGE);
 		data += Helper::getPaddedNumber(result.length(), 3);
 		data += result;
@@ -705,7 +753,7 @@ void Server::handleAskPermission(ReceivedMessage* msg)
 	string data = to_string(Protocol::ADD_USER_TO_GROUP);
 	string message = msg->getValues()[0];
 	data += Helper::getPaddedNumber(message.length(), 3);
-	data += message;
+	data += MsgEncrypt::Encipher(message, "cipher");
 	Helper::sendBlockingData(blockingSocket, data);
 
 	int typeCode = Helper::getMessageTypeCode(blockingSocket);
@@ -713,4 +761,16 @@ void Server::handleAskPermission(ReceivedMessage* msg)
 	data = to_string(typeCode) + to_string(answer);
 
 	Helper::sendData(msg->getSock(), data);
+}
+
+void Server::handleInsertNewGroup(ReceivedMessage* msg)
+{
+	string groupName = msg->getValues()[0];
+	vector<string> users = Helper::split(msg->getValues()[1], '/');
+
+	db->insertNewGroup(groupName, "null");
+	for (string username : users)
+	{
+		db->addUserToGroup(groupName, username);
+	}
 }

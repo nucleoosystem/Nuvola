@@ -27,6 +27,8 @@
 class ReceivedMessage;
 class Database;
 
+extern SOCKET blockingSocket;
+
 class Server
 {
 public:
@@ -69,6 +71,7 @@ private:
 	void handleUploadFileToGroup(ReceivedMessage* msg);
 	void handleDeleteUserFromGroup(ReceivedMessage* msg);
 	void handleExitGroup(ReceivedMessage* msg);
+	void handleInsertNewGroup(ReceivedMessage* msg);
 
 	void handleFinishWork(ReceivedMessage* msg);
 	void handleDeleteVHD(ReceivedMessage* msg);
@@ -79,5 +82,4 @@ private:
 	Database* db;
 	static User* currentUser;
 	static string username;
-	SOCKET blockingSocket;
 };

@@ -125,7 +125,8 @@ namespace NuvolaWPF.Pages
                     for(int i = 0; i < amount; i++)
                     {
                         string username = sh.recvDataWithSize();
-                        usersCombo.Items.Add(username);
+                        if(!usersList.Items.Contains(username))
+                            usersCombo.Items.Add(username);
                     }
                 }
                 catch (SocketException ex)
@@ -167,30 +168,30 @@ namespace NuvolaWPF.Pages
             {
                 // Open document
                 fileName = dlg.FileName;
-            }
 
-            string data = "209";
-            if (groupNameLbl.Content == null)
-                return;
-            data += groupNameLbl.Content.ToString().Length.ToString().PadLeft(2, '0');
-            data += SocketHandler.Encipher(groupNameLbl.Content.ToString(), "cipher");
-            data += fileName.Length.ToString().PadLeft(3, '0');
-            data += SocketHandler.Encipher(fileName, "cipher");
+                string data = "209";
+                if (groupNameLbl.Content == null)
+                    return;
+                data += groupNameLbl.Content.ToString().Length.ToString().PadLeft(2, '0');
+                data += SocketHandler.Encipher(groupNameLbl.Content.ToString(), "cipher");
+                data += fileName.Length.ToString().PadLeft(3, '0');
+                data += SocketHandler.Encipher(fileName, "cipher");
 
-            SocketHandler sh = new SocketHandler();
-            try
-            {
-                sh.sendData(data);
-            }
-            catch (SocketException ex)
-            {
-                Notifier n = AsyncBlockingSocket.initNotifier();
-                n.ShowError(ex.ToString());
-            }
-            catch (Exception ex)
-            {
-                Notifier n = AsyncBlockingSocket.initNotifier();
-                n.ShowError(ex.ToString());
+                SocketHandler sh = new SocketHandler();
+                try
+                {
+                    sh.sendData(data);
+                }
+                catch (SocketException ex)
+                {
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
+                }
             }
         }
 
@@ -225,6 +226,7 @@ namespace NuvolaWPF.Pages
 
                 GetInfoAboutGroups();
                 updateView(groupName);
+                usersCombo.Items.Remove(username);
             }
         }
 

@@ -33,6 +33,7 @@ namespace Protocol
 	const int UPLOAD_FILE_TO_GROUP = 209;
 	const int DELETE_USER_FROM_GROUP = 212;
 	const int EXIT_GROUP = 215;
+	const int NEW_GROUP_INFO = 217;
 
 	const int GET_WORK_END = 211;
 	const int DELETE_VHD = 216;
@@ -41,4 +42,5 @@ namespace Protocol
 
 	const int ASK_PERMIT = 300;
 	const int GENERAL_MESSAGE = 500;
+	const int FILE_UPLOAD_INFO = 302;
 }

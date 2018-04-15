@@ -25,6 +25,7 @@
 
 #include "../Logic/Helper.h"
 #include "../DB/Database.h"
+#include "../Logic/Server.h"
 #include "Protocols.h"
 #include "WComm.h"
 
@@ -41,15 +42,19 @@ class LocalNetFunctions
 {
 public:
 	static void getUsersOnNetwork(SOCKET userSocket);
+
 	static int uploadFileToGroup(string filePath, int encrypt, vector<string> ips);
 	static int receiveFile();
 	static int sendFileToIp(char* ip, char* path);
+
 	static std::vector<std::string> split(const std::string &text, char sep);
 	static string usernameToIP(string username);
 	static string IPToUsername(string ip);
 	static void addUserToList(string username, string IP);
 	static void writeToIpsFile(string ip, string username, string email, string cloudSize);
+
 	static int askUserForPermission(string ip, string message);
+	static void sendUserInfoAboutGroup(string ip, string groupName, string users);
 
 private:
 	static std::vector<std::pair<std::string, std::string>> getLocalIpAddress();

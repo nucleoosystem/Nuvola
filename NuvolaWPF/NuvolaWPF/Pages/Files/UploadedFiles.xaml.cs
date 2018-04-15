@@ -85,7 +85,7 @@ namespace NuvolaWPF.Pages.Files
 
         public void AddRowToGrid(string fileName, string fileType, string fileLoc, string fileSize)
         {
-            File newFile = new File { name = fileName, type = fileType, user = fileLoc, size = fileSize };
+            File newFile = new File { name = fileName, type = fileType, user = fileLoc, size = Convert.ToInt32(fileSize) };
             dataGrid.Items.Add(newFile);
         }
 
@@ -100,8 +100,10 @@ namespace NuvolaWPF.Pages.Files
             string fileName = ((TextBlock)fileNameCol.Content).Text;
 
             string data = "214";
-            data += fileName.Length.ToString().PadLeft(2, '0') + fileName;
-            data += atUser.Length.ToString().PadLeft(2, '0') + atUser;
+            data += fileName.Length.ToString().PadLeft(2, '0');
+            data += SocketHandler.Encipher(fileName, "cipher");
+            data += atUser.Length.ToString().PadLeft(2, '0');
+            data += SocketHandler.Encipher(atUser, "cipher");
 
             SocketHandler sh = new SocketHandler();
             try
@@ -126,6 +128,6 @@ namespace NuvolaWPF.Pages.Files
         public string name { get; set; }
         public string type { get; set; }
         public string user { get; set; }
-        public string size { get; set; }
+        public int size { get; set; }
     }
 }

@@ -143,16 +143,15 @@ void WComm::fileReceive(char *filename)
 
 }
 
-void WComm::fileSend(char *fpath)
+void WComm::fileSend(char *fpath, SOCKET blockingSocket)
 {
-
 	// Extract only filename from given path.
 	char filename[50];
 	int i = strlen(fpath);
 	for (; i>0; i--)if (fpath[i - 1] == '\\')break;
 	for (int j = 0; i <= (int)strlen(fpath); i++)filename[j++] = fpath[i];
 	////////////////////////////////////////
-
+	
 	ifstream myFile(fpath, ios::in | ios::binary | ios::ate);
 	int size = (int)myFile.tellg();
 	myFile.close();
@@ -169,10 +168,15 @@ void WComm::fileSend(char *fpath)
 
 	FILE *fr = fopen(fpath, "rb");
 
+	int oldSize = size;
+	int percentage = 0;
+
 	while (size > 0)
 	{
 		char buffer[1030];
-
+		percentage = ((oldSize - size) * 100) / oldSize;
+		sendFileUploadPer(filename, percentage, blockingSocket);
+		
 		if (size >= 1024)
 		{
 			fread(buffer, 1024, 1, fr);
@@ -192,7 +196,17 @@ void WComm::fileSend(char *fpath)
 		size -= 1024;
 
 	}
+	sendFileUploadPer(filename, 100, blockingSocket); // The file upload was finished
 
 	fclose(fr);
+}
 
+void WComm::sendFileUploadPer(string fileName, int percentage, SOCKET blockingSocket)
+{
+	string data = to_string(Protocol::FILE_UPLOAD_INFO);
+	data += Helper::getPaddedNumber(fileName.length(), 3);
+	data += MsgEncrypt::Encipher(fileName, "cipher");
+	data += Helper::getPaddedNumber(percentage, 3);
+
+	Helper::sendBlockingData(blockingSocket, data);
 }

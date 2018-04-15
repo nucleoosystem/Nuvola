@@ -72,3 +72,9 @@ C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\Nuvol
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\MessagesPage.g.cs
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\bin\Debug\ToastNotifications.dll
 C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\bin\Debug\ToastNotifications.Messages.dll
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Login\RegisterPage.baml
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Login\RegisterPage.g.cs
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Login\ForgotPassPage.baml
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\Pages\Login\ForgotPassPage.g.cs
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\NuvolaWPF_Content.g.cs
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\bin\Debug\NuvolaWPF.exe.config

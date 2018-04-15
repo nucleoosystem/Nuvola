@@ -586,6 +586,8 @@ bool Database::addFileToDB(string name, string type, string user, string size)
 		return false;
 	}
 
+	name = Helper::split(name, '\\').back(); // Getting the name from the full path
+
 	sqlQuery = "INSERT INTO t_files (filename, type, at_user, filesize) VALUES(\'";
 	sqlQuery += name + "\',\'";
 	sqlQuery += type + "\',\'";
