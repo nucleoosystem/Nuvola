@@ -33,6 +33,7 @@
                 <Label Content="Cloud Size: " Margin="0,20,0,0" FontSize="26"></Label>
                 <Label Name="cloudSizeLbl" FontSize="26"></Label>
                 <Button Content="Send A File" Name="sendBtn" Margin="0,20,0,0" Width="100" Height="50" HorizontalAlignment="Left" Click="sendBtn_Click"></Button>
+                <mui:ModernToggleButton Content="Encrypt Files"></mui:ModernToggleButton>
             </StackPanel>
         </ScrollViewer>
     </Grid>

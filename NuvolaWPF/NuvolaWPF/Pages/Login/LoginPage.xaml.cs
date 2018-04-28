@@ -21,6 +21,7 @@ using ToastNotifications;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Position;
 using ToastNotifications.Messages;
+using System.Security.Cryptography;
 
 namespace NuvolaWPF.Pages.Login
 {
@@ -41,38 +42,62 @@ namespace NuvolaWPF.Pages.Login
 
         private void loginBtn_Click(object sender, RoutedEventArgs e)
         {
-            string data = "200";
-            data += usernameBox.Text.Length.ToString().PadLeft(2, '0');
-            data += SocketHandler.Encipher(usernameBox.Text, "cipher");
-            data += passwordBox.Password.Length.ToString().PadLeft(2, '0');
-            data += SocketHandler.Encipher(passwordBox.Password, "cipher");
-
-            SocketHandler sh = new SocketHandler();
-            try
+            if (usernameBox.Text == "" || passwordBox.Password == "")
             {
-                sh.sendData(data);
-                string result = sh.recvData();
-                if (result.Equals("1000"))
+                Notifier n = new Notifier(cfg =>
                 {
-                    LoadingPage app = new LoadingPage();
-                    this.Close();
-                    app.Show();
+                    cfg.PositionProvider = new WindowPositionProvider(
+                        parentWindow: this,
+                        corner: Corner.BottomRight,
+                        offsetX: 10,
+                        offsetY: 10);
+
+                    cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
+                        notificationLifetime: TimeSpan.FromSeconds(2),
+                        maximumNotificationCount: MaximumNotificationCount.FromCount(1));
+
+                    cfg.Dispatcher = Application.Current.Dispatcher;
+                });
+
+                n.ShowWarning("Please fill all required values.");
+            }
+            else
+            {
+                string hashPassword = ComputeHash(passwordBox.Password, new MD5CryptoServiceProvider());
+
+                string data = "200";
+                data += usernameBox.Text.Length.ToString().PadLeft(2, '0');
+                data += SocketHandler.Encipher(usernameBox.Text, "cipher");
+                data += hashPassword.Length.ToString().PadLeft(2, '0');
+                data += SocketHandler.Encipher(hashPassword, "cipher");
+
+                SocketHandler sh = new SocketHandler();
+                try
+                {
+                    sh.sendData(data);
+                    string result = sh.recvData();
+                    if (result.Equals("1000"))
+                    {
+                        LoadingPage app = new LoadingPage();
+                        this.Close();
+                        app.Show();
+                    }
+                    else
+                    {
+                        Notifier n = AsyncBlockingSocket.initNotifier();
+                        n.ShowWarning("Wrong username or password");
+                    }
                 }
-                else
+                catch (SocketException ex)
                 {
                     Notifier n = AsyncBlockingSocket.initNotifier();
-                    n.ShowWarning("Wrong username or password");
+                    n.ShowError(ex.Message);
                 }
-            }
-            catch (SocketException ex)
-            {
-                Notifier n = AsyncBlockingSocket.initNotifier();
-                n.ShowError(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Notifier n = AsyncBlockingSocket.initNotifier();
-                n.ShowError(ex.Message);
+                catch (Exception ex)
+                {
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.Message);
+                }
             }
         }
 
@@ -90,6 +115,16 @@ namespace NuvolaWPF.Pages.Login
             this.Hide();
             app.ShowDialog();
             this.Show();
+        }
+
+        private string ComputeHash(string input, HashAlgorithm algorithm)
+        {
+            Byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+            Byte[] hashedBytes = algorithm.ComputeHash(inputBytes);
+
+            string hPassword = BitConverter.ToString(hashedBytes);
+            hPassword = hPassword.Replace("-", "");
+            return hPassword;
         }
 
         private void ModernWindow_Closed(object sender, EventArgs e)

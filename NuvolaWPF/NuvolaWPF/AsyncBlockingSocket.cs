@@ -87,6 +87,9 @@ namespace NuvolaWPF
                         case 500:
                             handleGeneralMessage();
                             break;
+                        case 501:
+                            handleErrorMessage();
+                            break;
                         default:
                             MessageBox.Show("Unknown Message Received: " + msgCode.ToString());
                             break;
@@ -121,7 +124,7 @@ namespace NuvolaWPF
         {
             string message = recvData(3);
             Pages.MessagesPage.list.Add(new Tuple<string, string>("Request To Send File", message));
-            notifier.ShowInformation("Someone wants to send you a file");
+            notifier.ShowInformation("Someone has sent you a file");
         }
 
         public void handleGeneralMessage()
@@ -131,7 +134,13 @@ namespace NuvolaWPF
             notifier.ShowInformation("A New Message arrived");
         }
 
-        public static Notifier initPrecentageNotifier()
+        public void handleErrorMessage()
+        {
+            string message = recvData(3);
+            notifier.ShowError(message);
+        }
+
+        public static Notifier initPrecentageNotifier() 
         {
             Notifier notifier = new Notifier(cfg =>
             {
@@ -164,7 +173,7 @@ namespace NuvolaWPF
                     offsetY: 10);
 
                 cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
-                    notificationLifetime: TimeSpan.FromSeconds(8),
+                    notificationLifetime: TimeSpan.FromSeconds(4),
                     maximumNotificationCount: MaximumNotificationCount.FromCount(4));
 
                 cfg.Dispatcher = Application.Current.Dispatcher;

@@ -4,16 +4,16 @@
 winexe
 C#
 .cs
-C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\obj\Debug\
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NotStable\NuvolaWPF\NuvolaWPF\obj\Debug\
 NuvolaWPF
 none
 false
 DEBUG;TRACE
-C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NuvolaWPF\NuvolaWPF\App.xaml
+C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NotStable\NuvolaWPF\NuvolaWPF\App.xaml
 161723376169
 11193353679
 22807232602
-18556962640
+18247865325
 MainWindow.xaml;Pages\Login\ForgotPassPage.xaml;Pages\Login\RegisterPage.xaml;Pages\MessagesPage.xaml;Pages\DevicesPage.xaml;Pages\FilesPage.xaml;Pages\Files\UploadedFiles.xaml;Pages\GroupsPage.xaml;Pages\Groups\CreateGroup.xaml;Pages\LoadingPage.xaml;Pages\Login\LoginPage.xaml;Pages\Settings\About.xaml;Pages\Settings\Appearance.xaml;Pages\Home.xaml;Pages\SettingsPage.xaml;Pages\Settings\VHDSettings.xaml;
 
 False

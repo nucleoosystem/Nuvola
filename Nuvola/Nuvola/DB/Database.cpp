@@ -658,6 +658,72 @@ vector<vector<string>> Database::getAllFilesInfo()
 	return values;
 }
 
+void Database::removeNetworkUser(string username)
+{
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+		return;
+	}
+
+	sqlQuery = "DELETE FROM t_otherUsers WHERE username = \"" + username + "\"";
+	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+		return;
+	}
+}
+
+void Database::addUsersToGroup(string groupName, string users)
+{
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+	}
+
+	sqlQuery = "SELECT users FROM t_groups WHERE group_name = \"" + groupName + "\"";
+	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+	}
+
+	auto it = results.begin();
+	if (it != results.end() && it->second.size() > 0)
+	{
+		sqlQuery = "UPDATE t_groups SET users = \"" + users + "\" WHERE group_name = \"" + groupName + "\"";
+		rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+		if (rc != SQLITE_OK)
+		{
+			cout << "SQL error: " << zErrMsg << endl;
+			sqlite3_free(zErrMsg);
+			system("Pause");
+		}
+	}
+
+	results.clear();
+	sqlite3_close(db);
+}
+
 int Database::callback(void* notUsed, int argc, char** argv, char** azCol)
 {
 	int i;

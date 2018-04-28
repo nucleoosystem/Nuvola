@@ -35,14 +35,12 @@
                 <ListView Name="usersList" ItemsSource="{Binding SourceCollection}" TextElement.FontSize="26">
                     <ListView.View>
                         <GridView>
+                            <GridView.ColumnHeaderContainerStyle>
+                                <Style TargetType="GridViewColumnHeader">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </Style>
+                            </GridView.ColumnHeaderContainerStyle>
                             <GridViewColumn Width="200"/>
-                            <GridViewColumn>
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button fa:Awesome.Content="Ban" Name="deleteBtn" Click="deleteBtn_Click"></Button>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
                         </GridView>
                     </ListView.View>
                 </ListView>

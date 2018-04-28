@@ -224,9 +224,13 @@ namespace NuvolaWPF.Pages
                     n.ShowError(ex.ToString());
                 }
 
-                GetInfoAboutGroups();
-                updateView(groupName);
+                usersList.Items.Add(username);
                 usersCombo.Items.Remove(username);
+            }
+            else
+            {
+                Notifier n = AsyncBlockingSocket.initNotifier();
+                n.ShowError("Please pick a valid user.");
             }
         }
 

@@ -41,6 +41,7 @@ namespace Protocol
 	/////////////////////////////////////////////////////////////
 
 	const int ASK_PERMIT = 300;
-	const int GENERAL_MESSAGE = 500;
 	const int FILE_UPLOAD_INFO = 302;
+	const int GENERAL_MESSAGE = 500;
+	const int ERROR_MESSAGE = 501;
 }

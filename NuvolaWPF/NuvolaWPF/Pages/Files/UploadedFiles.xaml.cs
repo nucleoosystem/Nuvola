@@ -99,16 +99,68 @@ namespace NuvolaWPF.Pages.Files
             string atUser = ((TextBlock)atUserCol.Content).Text;
             string fileName = ((TextBlock)fileNameCol.Content).Text;
 
-            string data = "214";
-            data += fileName.Length.ToString().PadLeft(2, '0');
-            data += SocketHandler.Encipher(fileName, "cipher");
-            data += atUser.Length.ToString().PadLeft(2, '0');
-            data += SocketHandler.Encipher(atUser, "cipher");
+            if (isUserConntected(atUser))
+            {
+                string data = "214";
+                data += fileName.Length.ToString().PadLeft(2, '0');
+                data += SocketHandler.Encipher(fileName, "cipher");
+                data += atUser.Length.ToString().PadLeft(2, '0');
+                data += SocketHandler.Encipher(atUser, "cipher");
 
-            SocketHandler sh = new SocketHandler();
+                SocketHandler sh = new SocketHandler();
+                try
+                {
+                    sh.sendData(data);
+                }
+                catch (SocketException ex)
+                {
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Notifier n = AsyncBlockingSocket.initNotifier();
+                    n.ShowError(ex.ToString());
+                }
+            }
+            else
+            {
+                Notifier n = new Notifier(cfg =>
+                {
+                    cfg.DisplayOptions.TopMost = true;
+
+                    cfg.PositionProvider = new WindowPositionProvider(
+                        parentWindow: Application.Current.MainWindow,
+                        corner: Corner.BottomRight,
+                        offsetX: 10,
+                        offsetY: 10);
+
+                    cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
+                        notificationLifetime: TimeSpan.FromSeconds(2),
+                        maximumNotificationCount: MaximumNotificationCount.FromCount(1));
+
+                    cfg.Dispatcher = Application.Current.Dispatcher;
+                });
+
+                n.ShowError("The user is not connected.");
+            }
+        }
+
+        private bool isUserConntected(string username)
+        {
+            List<string> users = new List<string>();
             try
             {
-                sh.sendData(data);
+                SocketHandler sh = new SocketHandler();
+                sh.sendData("210");
+
+                sh.getMsgCode();
+                int amount = int.Parse(sh.recvDataWithSize());
+                for (int i = 0; i < amount; i++)
+                {
+                    string connectedUser = sh.recvDataWithSize();
+                    users.Add(connectedUser);
+                }
             }
             catch (SocketException ex)
             {
@@ -120,6 +172,10 @@ namespace NuvolaWPF.Pages.Files
                 Notifier n = AsyncBlockingSocket.initNotifier();
                 n.ShowError(ex.ToString());
             }
+
+            if (users.Contains(username))
+                return true;
+            return false;
         }
     }
 

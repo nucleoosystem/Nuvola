@@ -440,11 +440,6 @@ int LocalNetFunctions::askUserForPermission(string ip, string message)
 		data += Helper::getPaddedNumber(message.length(), 3);
 		data += MsgEncrypt::Encipher(message, "cipher");
 		Helper::sendData(clientSocket, data);
-		
-		int typeCode = Helper::getMessageTypeCode(clientSocket);
-		int answer = Helper::getIntPartFromSocket(clientSocket, 1);
-		
-		return answer;
 	}
 
 	return -1;

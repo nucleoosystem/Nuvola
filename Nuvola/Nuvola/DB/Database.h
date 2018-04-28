@@ -25,6 +25,7 @@ public:
 	string getUserEmail(string username);
 	string getUserCloudSize(string username);
 	void insertNetworkUser(string name, string email, string cloudSize);
+	void removeNetworkUser(string username);
 	vector<string> getInfoNetUser(string username);
 	void deleteAllNetworkUsers();
 	vector<string> getAllNetUsersInfo();
@@ -33,6 +34,7 @@ public:
 	void addUserToGroup(string groupName, string username);
 	vector<pair<string,string>>  getInfoAboutGroups();
 	void deleteUserFromGroup(string username, string groupName);
+	void addUsersToGroup(string groupName, string users); 
 
 	bool addFileToDB(string name, string type, string user, string size);
 	vector<vector<string>> getAllFilesInfo();

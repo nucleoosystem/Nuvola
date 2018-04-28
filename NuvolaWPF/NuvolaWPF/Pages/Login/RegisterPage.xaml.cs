@@ -21,6 +21,7 @@ using ToastNotifications;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Position;
 using ToastNotifications.Messages;
+using System.Security.Cryptography;
 
 namespace NuvolaWPF.Pages.Login
 {
@@ -38,61 +39,95 @@ namespace NuvolaWPF.Pages.Login
 
         private void registerBtn_Click(object sender, RoutedEventArgs e)
         {
-            string data = "202";
-            data += usernameBox.Text.Length.ToString().PadLeft(2, '0');
-            data += SocketHandler.Encipher(usernameBox.Text, "cipher");
-            data += passwordBox.Password.Length.ToString().PadLeft(2, '0');
-            data += SocketHandler.Encipher(passwordBox.Password, "cipher");
-            data += emailBox.Text.Length.ToString().PadLeft(2, '0');
-            data += SocketHandler.Encipher(emailBox.Text, "cipher");
-            data += sizeBox.Text.Length.ToString().PadLeft(2, '0');
-            data += SocketHandler.Encipher(sizeBox.Text, "cipher");
-
-            Notifier notifier = new Notifier(cfg =>
+            if (usernameBox.Text == "" || passwordBox.Password == "" || emailBox.Text == "" || sizeBox.Text == "")
             {
-                cfg.PositionProvider = new WindowPositionProvider(
-                    parentWindow: this,
-                    corner: Corner.BottomRight,
-                    offsetX: 10,
-                    offsetY: 10);
+                Notifier n = new Notifier(cfg =>
+                {
+                    cfg.PositionProvider = new WindowPositionProvider(
+                        parentWindow: this,
+                        corner: Corner.BottomRight,
+                        offsetX: 10,
+                        offsetY: 10);
 
-                cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
-                    notificationLifetime: TimeSpan.FromSeconds(8),
-                    maximumNotificationCount: MaximumNotificationCount.FromCount(4));
+                    cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
+                        notificationLifetime: TimeSpan.FromSeconds(2),
+                        maximumNotificationCount: MaximumNotificationCount.FromCount(1));
 
-                cfg.Dispatcher = Application.Current.Dispatcher;
-            }); 
-            
-            SocketHandler sh = new SocketHandler();
-            try
+                    cfg.Dispatcher = Application.Current.Dispatcher;
+                });
+
+                n.ShowWarning("Please fill all required values.");
+            }
+            else
             {
-                sh.sendData(data);
-                string result = sh.recvData();
-                if (result.Equals("1010"))
+                string hashPassword = ComputeHash(passwordBox.Password, new MD5CryptoServiceProvider());
+
+                string data = "202";
+                data += usernameBox.Text.Length.ToString().PadLeft(2, '0');
+                data += SocketHandler.Encipher(usernameBox.Text, "cipher");
+                data += hashPassword.Length.ToString().PadLeft(2, '0');
+                data += SocketHandler.Encipher(hashPassword, "cipher");
+                data += emailBox.Text.Length.ToString().PadLeft(2, '0');
+                data += SocketHandler.Encipher(emailBox.Text, "cipher");
+                data += sizeBox.Text.Length.ToString().PadLeft(2, '0');
+                data += SocketHandler.Encipher(sizeBox.Text, "cipher");
+
+                Notifier notifier = new Notifier(cfg =>
                 {
-                    this.Close();
+                    cfg.PositionProvider = new WindowPositionProvider(
+                        parentWindow: this,
+                        corner: Corner.BottomRight,
+                        offsetX: 10,
+                        offsetY: 10);
+
+                    cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
+                        notificationLifetime: TimeSpan.FromSeconds(4),
+                        maximumNotificationCount: MaximumNotificationCount.FromCount(1));
+
+                    cfg.Dispatcher = Application.Current.Dispatcher;
+                });
+
+                SocketHandler sh = new SocketHandler();
+                try
+                {
+                    sh.sendData(data);
+                    string result = sh.recvData();
+                    if (result.Equals("1010"))
+                    {
+                        this.Close();
+                    }
+                    else if (result.Equals("1011"))
+                    {
+                        notifier.ShowWarning("Password is illegal");
+                    }
+                    else if (result.Equals("1013"))
+                    {
+                        notifier.ShowWarning("Username is illegal");
+                    }
+                    else if (result.Equals("1015"))
+                    {
+                        notifier.ShowWarning("Not enough room on the computer");
+                    }
                 }
-                else if(result.Equals("1011"))
+                catch (SocketException ex)
                 {
-                    notifier.ShowWarning("Password is illegal");
+                    notifier.ShowError(ex.Message);
                 }
-                else if(result.Equals("1013"))
+                catch (Exception ex)
                 {
-                    notifier.ShowWarning("Username is illegal");
-                }
-                else if (result.Equals("1015"))
-                {
-                    notifier.ShowWarning("Not enough room on the computer");
+                    notifier.ShowError(ex.Message);
                 }
             }
-            catch (SocketException ex)
-            {
-                notifier.ShowError(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                notifier.ShowError(ex.Message);
-            }
+        }
+
+        private string ComputeHash(string input, HashAlgorithm algorithm)
+        {
+            Byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+            Byte[] hashedBytes = algorithm.ComputeHash(inputBytes);
+
+            string hPassword = BitConverter.ToString(hashedBytes);
+            hPassword = hPassword.Replace("-", "");
+            return hPassword;
         }
 
         private void exitToLoginBtn_Click(object sender, RoutedEventArgs e)

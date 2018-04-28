@@ -460,10 +460,11 @@ int Server::handleUploadFile(ReceivedMessage* msg)
 
 	string ip = ips[0]; // The computer that we send the file to
 	string fileName = Helper::split(filePath, '\\').back();
-	string message = username + " Wants to send you the file: " + fileName;
+	string message = username + " has sent you the file: " + fileName;
 
-	int answer = LocalNetFunctions::askUserForPermission(ip, message);
-	if (answer == 1)
+	LocalNetFunctions::askUserForPermission(ip, message);
+
+	try
 	{
 		if (ips.size() == 1)
 		{
@@ -474,10 +475,10 @@ int Server::handleUploadFile(ReceivedMessage* msg)
 			LocalNetFunctions::uploadFileToGroup(filePath, encrypt, ips);
 		}
 	}
-		else
+	catch (exception ex)
 	{
-		string result = MsgEncrypt::Encipher("User refused to accept the file", "cipher");
-		string data = to_string(Protocol::GENERAL_MESSAGE);
+		string result = MsgEncrypt::Encipher(ex.what(), "cipher");
+		string data = to_string(Protocol::ERROR_MESSAGE);
 		data += Helper::getPaddedNumber(result.length(), 3);
 		data += result;
 
@@ -522,9 +523,10 @@ void Server::handleAddUserToGroup(ReceivedMessage* msg)
 {
 	string ip = LocalNetFunctions::usernameToIP(msg->getValues()[0]);
 	string message = "You are invited to join the group " + msg->getValues()[1];
-	
-	int answer = LocalNetFunctions::askUserForPermission(ip, message);
-	if (answer == 1)
+
+	LocalNetFunctions::askUserForPermission(ip, message);
+
+	try
 	{
 		string users;
 		string groupName = msg->getValues()[1];
@@ -537,10 +539,10 @@ void Server::handleAddUserToGroup(ReceivedMessage* msg)
 
 		db->addUserToGroup(msg->getValues()[1], msg->getValues()[0]); // Adding the user to our database
 	}
-	else
+	catch (exception ex)
 	{
-		string result = MsgEncrypt::Encipher("User refused to join the group", "cipher");
-		string data = to_string(Protocol::GENERAL_MESSAGE);
+		string result = MsgEncrypt::Encipher(ex.what(), "cipher");
+		string data = to_string(Protocol::ERROR_MESSAGE);
 		data += Helper::getPaddedNumber(result.length(), 3);
 		data += result;
 
@@ -618,11 +620,23 @@ void Server::handleUploadFileToGroup(ReceivedMessage* msg)
 	
 	for (auto user : users)
 	{
-		if (LocalNetFunctions::usernameToIP(user).compare("Not Found") != 0)
+		if (LocalNetFunctions::usernameToIP(user) != "")
 			ips.push_back(LocalNetFunctions::usernameToIP(user));
 	}
 
-	LocalNetFunctions::uploadFileToGroup(msg->getValues()[1], 0, ips);
+	if (ips.size() > 0)
+	{
+		LocalNetFunctions::uploadFileToGroup(msg->getValues()[1], 0, ips);
+	}
+	else
+	{
+		string errorMsg = "No one in the group is connected.";
+		string data = to_string(Protocol::ERROR_MESSAGE);
+		data += Helper::getPaddedNumber(errorMsg.length(), 3);
+		data += MsgEncrypt::Encipher(errorMsg, KEY);
+
+		Helper::sendBlockingData(blockingSocket, data);
+	}
 }
 
 void Server::handleGetAllUsersInfo(ReceivedMessage* msg)
@@ -750,17 +764,11 @@ void Server::connectBlockingSocket()
 
 void Server::handleAskPermission(ReceivedMessage* msg)
 {
-	string data = to_string(Protocol::ADD_USER_TO_GROUP);
+	string data = to_string(Protocol::GENERAL_MESSAGE);
 	string message = msg->getValues()[0];
 	data += Helper::getPaddedNumber(message.length(), 3);
 	data += MsgEncrypt::Encipher(message, "cipher");
 	Helper::sendBlockingData(blockingSocket, data);
-
-	int typeCode = Helper::getMessageTypeCode(blockingSocket);
-	int answer = Helper::getIntPartFromSocket(blockingSocket, 1);
-	data = to_string(typeCode) + to_string(answer);
-
-	Helper::sendData(msg->getSock(), data);
 }
 
 void Server::handleInsertNewGroup(ReceivedMessage* msg)

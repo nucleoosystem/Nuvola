@@ -64,16 +64,6 @@ namespace NuvolaWPF.Pages
             }
         }
 
-        private void yesBtn_Click(object sender, RoutedEventArgs e)
-        {
-            AsyncBlockingSocket.sendData("4001");   
-        }
-
-        private void noBtn_Click(object sender, RoutedEventArgs e)
-        {
-            AsyncBlockingSocket.sendData("4000"); 
-        }
-
         private void titleList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ((ListBoxItem)titleList.SelectedItem).FontWeight = FontWeights.Regular;
