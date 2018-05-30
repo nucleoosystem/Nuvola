@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "Crypt.h"
+#include "FileEncryption.h"
 
 class FileEncrypt
 {

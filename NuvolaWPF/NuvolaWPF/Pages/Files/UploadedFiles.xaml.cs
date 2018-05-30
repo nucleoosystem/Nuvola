@@ -67,8 +67,9 @@ namespace NuvolaWPF.Pages.Files
                     string fileSize = sh.recvDataWithGivenSize(length);
                     length = sh.getDataLen(2);
                     string fileLoc = sh.recvDataWithGivenSize(length);
+                    int isEncrypted = int.Parse(sh.recvDataWithGivenSize(1));
 
-                    AddRowToGrid(fileName, fileType, fileLoc, fileSize);
+                    AddRowToGrid(fileName, fileType, fileLoc, fileSize, isEncrypted);
                 }
             }
             catch (SocketException ex)
@@ -83,9 +84,9 @@ namespace NuvolaWPF.Pages.Files
             }
         }
 
-        public void AddRowToGrid(string fileName, string fileType, string fileLoc, string fileSize)
+        public void AddRowToGrid(string fileName, string fileType, string fileLoc, string fileSize, int isEncrypted)
         {
-            File newFile = new File { name = fileName, type = fileType, user = fileLoc, size = Convert.ToInt32(fileSize) };
+            File newFile = new File { name = fileName, type = fileType, user = fileLoc, size = Convert.ToDouble(fileSize) / 1024, encrypted = isEncrypted}; // Bytes to KiloBytes
             dataGrid.Items.Add(newFile);
         }
 
@@ -184,6 +185,7 @@ namespace NuvolaWPF.Pages.Files
         public string name { get; set; }
         public string type { get; set; }
         public string user { get; set; }
-        public int size { get; set; }
+        public double size { get; set; }
+        public int encrypted { get; set; }
     }
 }

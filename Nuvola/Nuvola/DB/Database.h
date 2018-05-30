@@ -35,9 +35,11 @@ public:
 	vector<pair<string,string>>  getInfoAboutGroups();
 	void deleteUserFromGroup(string username, string groupName);
 	void addUsersToGroup(string groupName, string users); 
+	void deleteGroup(string groupName);
 
-	bool addFileToDB(string name, string type, string user, string size);
+	bool addFileToDB(string name, string type, string user, string size, int isEncrypted);
 	vector<vector<string>> getAllFilesInfo();
+	int isFileEncrypted(string name);
 
 	static int callback(void*, int, char**, char**);
 

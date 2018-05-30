@@ -4,7 +4,10 @@ static const GUID VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT = { 0xEC984AEC, 0xA0F9, 
 
 DWORD CreateVirtualDriver(PCWSTR path, int size)
 {
-	HANDLE handle;
+	/*HANDLE handle;
+
+	createVHDFile(size);
+
 	DWORD result = CreateDisk(path, &handle, size);
 
 	if (result == ERROR_FILE_EXISTS)
@@ -12,19 +15,19 @@ DWORD CreateVirtualDriver(PCWSTR path, int size)
 		result = OpenDisk(path, &handle);
 		if (result != ERROR_SUCCESS)
 		{
-			std::wcout << "Unable to open virtual disk" << std::endl;
+			std::cout << "Unable to open virtual disk" << std::endl;
 			return 1;
 		}
 	}
 	else if (result != ERROR_SUCCESS)
 	{
-		std::wcout << "Unable to create virtual disk" << std::endl;
+		std::cout << "Unable to create virtual disk" << std::endl;
 		return 1;
 	}
 
-	CloseHandle(handle);
+	CloseHandle(handle);*/
 	
-	editDiskpartCommands(path);
+	editDiskpartCommands(path, size);
 	diskpartCall();
 
 	return 0;
@@ -102,15 +105,13 @@ void diskpartCall()
 }
 
 
-void editDiskpartCommands(PCWSTR path)
+void editDiskpartCommands(PCWSTR path, int mbSize)
 {
 	std::vector<std::string> commands;	
-	
-	commands.push_back("select vdisk file = ");
+	std::wstring strPath(path);
 
-	std::wstring wstr(path);
-
-	commands.push_back(std::string(wstr.begin(), wstr.end()));
+	commands.push_back("create vdisk file=" + std::string(strPath.begin(), strPath.end()) + " maximum=" + to_string(mbSize));
+	commands.push_back("select vdisk file = " + std::string(strPath.begin(), strPath.end()));
 	commands.push_back("attach vdisk");
 	commands.push_back("create partition primary");
 	commands.push_back("active");
@@ -130,23 +131,27 @@ void editDiskpartCommands(PCWSTR path)
 	file.open(fullPath, std::ios::trunc);
 	if (file.is_open())
 	{
-		file.write(commands[0].c_str(), commands[0].size());
-		file.write(commands[1].c_str(), commands[1].size());
-
-		for (int i = 2; i < commands.size(); i++)
+		for (int i = 0; i < commands.size(); i++)
 		{
-			file.write("\n", 1);
 			file.write(commands[i].c_str(), commands[i].size());
+			file.write("\n", 1);
 		}
 	}
 }
 
 void deleteVirtualHardDriver(string path)
 {
+	char buffer[MAX_PATH];
+	GetModuleFileNameA(NULL, buffer, MAX_PATH);
+	string::size_type pos = string(buffer).find_last_of("\\/");
+	string vhdPath = string(buffer).substr(0, pos) + "\\cloudFile.vhd";
+
 	std::vector<std::string> commands;
 	commands.push_back("select volume N");
 	commands.push_back("delete volume");
-
+	commands.push_back("select vdisk file=" + vhdPath);
+	commands.push_back("detach vdisk");
+	
 	std::ofstream file;
 	char* currentPath = NULL;
 	std::string fullPath = " ";
@@ -161,7 +166,12 @@ void deleteVirtualHardDriver(string path)
 	if (file.is_open())
 	{
 		file.write(commands[0].c_str(), commands[0].size());
+		file.write("\n", 1);
 		file.write(commands[1].c_str(), commands[1].size());
+		file.write("\n", 1);
+		file.write(commands[2].c_str(), commands[2].size());
+		file.write("\n", 1);
+		file.write(commands[3].c_str(), commands[3].size());
 	}
 
 	STARTUPINFO si;
@@ -181,5 +191,53 @@ void deleteVirtualHardDriver(string path)
 
 	CreateProcess(lpApplicationName, lpCommandLine, NULL, NULL, TRUE, creationFlags, NULL, NULL, &si, &pi);
 
+	//cout << "Remove returned:" << remove(path.c_str()) << endl;
+	//cout << "Errno returned: " << errno << endl;
+
 	std::cout << "Success Deleting" << std::endl;
+}
+
+void createVHDFile(int mbSize)
+{
+	char buffer[MAX_PATH];
+	GetModuleFileNameA(NULL, buffer, MAX_PATH);
+	string::size_type pos = string(buffer).find_last_of("\\/");
+	string path = string(buffer).substr(0, pos) + "\\cloudFile.vhd";
+
+	std::vector<std::string> commands;
+
+	commands.push_back("create vdisk file=" + path + " maximum=" + to_string(mbSize));
+
+	std::ofstream file;
+	char* currentPath = NULL;
+	std::string fullPath = " ";
+
+	currentPath = _getcwd(NULL, 0);
+
+	fullPath = currentPath;
+	fullPath += "\\";
+	fullPath += "diskPartScript.txt";
+
+	file.open(fullPath, std::ios::trunc);
+	if (file.is_open())
+	{
+		file.write(commands[0].c_str(), commands[0].size());
+	}
+
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	ZeroMemory(&pi, sizeof(pi));
+	si.cb = sizeof(si);
+	si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+	si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+	si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+	si.wShowWindow = SW_HIDE;
+
+	LPCTSTR lpApplicationName = L"c:\\WINDOWS\\system32\\diskpart.exe";
+	LPTSTR lpCommandLine = L"diskpart.exe /s diskPartScript.txt";
+	DWORD creationFlags = CREATE_NO_WINDOW;
+
+	CreateProcess(lpApplicationName, lpCommandLine, NULL, NULL, TRUE, creationFlags, NULL, NULL, &si, &pi);
 }

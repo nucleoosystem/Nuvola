@@ -26,7 +26,7 @@ namespace NuvolaWPF.Pages
         public FilesPage()
         {
             InitializeComponent();
-            string path = "C:\\";
+            string path = "N:\\";
             webView.Navigate(path);
             backButton.IsEnabled = false;
 

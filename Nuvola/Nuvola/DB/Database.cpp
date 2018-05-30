@@ -10,7 +10,7 @@ static char* fileName = "";
 Database::Database()
 {
 	string localPath = "\\..\\Nuvola\\DB\\database.db";
-	string fullPath = Helper::getCurrentPath() + localPath;
+	string fullPath = Helper::getCurrentPath() + localPath; // Adding the full path and the local path to get the database path
 	fileName = strdup(fullPath.c_str());
 
 	int rc;
@@ -65,7 +65,7 @@ bool Database::doesUserExists(string name)
 
 	for (size_t i = 0; it != results.end() && i < it->second.size(); i++)
 	{
-		if (it->second.at(i) == name)
+		if (it->second.at(i) == name) // Searching all users for the given name
 		{
 			results.clear();
 			return true;  
@@ -141,7 +141,7 @@ bool Database::isUserAndPassMatch(string username, string password)
 	unordered_map<string, vector<string>>::iterator it;
 
 	it = results.begin();
-	if (it != results.end() && it->second.at(0) == password)
+	if (it != results.end() && it->second.at(0) == password) // Checking if the given username has the given password
 	{
 		results.clear();
 		return true;
@@ -340,28 +340,30 @@ vector<pair<string,string>> Database::getInfoAboutGroups()
 		return groups;
 	}
 	
-	int length = results.begin()->second.size();
-	for (int i = 0; i < length; i++)
+	if (results.begin() != results.end())
 	{
-		values.push_back(vector<string>());
-	}
-
-	unordered_map<string, vector<string>>::iterator it;
-	int current = 0;
-	for (auto it = results.begin(); it != results.end(); it++)
-	{
+		int length = results.begin()->second.size();
 		for (int i = 0; i < length; i++)
 		{
-			values[i].push_back(it->second.at(i));
+			values.push_back(vector<string>());
+		}
+
+		unordered_map<string, vector<string>>::iterator it;
+		int current = 0;
+		for (auto it = results.begin(); it != results.end(); it++)
+		{
+			for (int i = 0; i < length; i++)
+			{
+				values[i].push_back(it->second.at(i));
+			}
+		}
+		results.clear();
+
+		for (int i = 0; i < values.size(); i++)
+		{
+			groups.push_back(pair<string, string>(values.at(i)[0], values.at(i)[1]));
 		}
 	}
-	results.clear();
-
-	for (int i = 0; i < values.size(); i++)
-	{
-		groups.push_back(pair<string, string>(values.at(i)[0], values.at(i)[1]));
-	}
-
 	sqlite3_close(db);
 
 	return groups;
@@ -571,7 +573,7 @@ void Database::deleteUserFromGroup(string username, string groupName)
 	sqlite3_close(db);
 }
 
-bool Database::addFileToDB(string name, string type, string user, string size)
+bool Database::addFileToDB(string name, string type, string user, string size, int isEncrypted)
 {
 	int rc;
 	sqlite3* db;
@@ -588,11 +590,12 @@ bool Database::addFileToDB(string name, string type, string user, string size)
 
 	name = Helper::split(name, '\\').back(); // Getting the name from the full path
 
-	sqlQuery = "INSERT INTO t_files (filename, type, at_user, filesize) VALUES(\'";
+	sqlQuery = "INSERT INTO t_files (filename, type, at_user, filesize, encrypted) VALUES(\'";
 	sqlQuery += name + "\',\'";
 	sqlQuery += type + "\',\'";
-	sqlQuery += user + "\',";
-	sqlQuery += size + ")";
+	sqlQuery += user + "\',\'";
+	sqlQuery += size + "\',";
+	sqlQuery += to_string(isEncrypted) + ")";
 
 	rc = sqlite3_exec(db, sqlQuery.c_str(), NULL, 0, &zErrMsg);
 	if (rc != SQLITE_OK)
@@ -636,23 +639,25 @@ vector<vector<string>> Database::getAllFilesInfo()
 		return values;
 	}
 
-	int length = results.begin()->second.size();
-	for (int i = 0; i < length; i++)
+	if (results.begin() != results.end())
 	{
-		values.push_back(vector<string>());
-	}
-
-	unordered_map<string, vector<string>>::iterator it;
-	int current = 0;
-	for (auto it = results.begin(); it != results.end(); it++)
-	{
+		int length = results.begin()->second.size();
 		for (int i = 0; i < length; i++)
 		{
-			values[i].push_back(it->second.at(i));
+			values.push_back(vector<string>());
 		}
-	}
-	results.clear();
 
+		unordered_map<string, vector<string>>::iterator it;
+		int current = 0;
+		for (auto it = results.begin(); it != results.end(); it++)
+		{
+			for (int i = 0; i < length; i++)
+			{
+				values[i].push_back(it->second.at(i));
+			}
+		}
+		results.clear();
+	}
 	sqlite3_close(db);
 
 	return values;
@@ -722,6 +727,72 @@ void Database::addUsersToGroup(string groupName, string users)
 
 	results.clear();
 	sqlite3_close(db);
+}
+
+void Database::deleteGroup(string groupName)
+{
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+		return;
+	}
+
+	sqlQuery = "DELETE FROM t_groups WHERE group_name = \"" + groupName + "\"";
+	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+		return;
+	}
+}
+
+int Database::isFileEncrypted(string name)
+{
+	int rc;
+	sqlite3* db;
+	char *zErrMsg = 0;
+	string sqlQuery = " ";
+	rc = sqlite3_open(fileName, &db);
+	if (rc)
+	{
+		cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+		sqlite3_close(db);
+		system("Pause");
+		return 0;
+	}
+
+	sqlQuery = "SELECT encrypted FROM t_files WHERE filename = '" + name + "'";
+	rc = sqlite3_exec(db, sqlQuery.c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		cout << "SQL error: " << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+		system("Pause");
+		return 0;
+	}
+
+	unordered_map<string, vector<string>>::iterator it = results.begin();
+
+	if (it != results.end())
+	{
+		int isEncrypted = atoi(it->second.at(0).c_str());
+		results.clear();
+		return isEncrypted;
+	}
+
+	results.clear();
+	sqlite3_close(db);
+
+	return 0;
 }
 
 int Database::callback(void* notUsed, int argc, char** argv, char** azCol)

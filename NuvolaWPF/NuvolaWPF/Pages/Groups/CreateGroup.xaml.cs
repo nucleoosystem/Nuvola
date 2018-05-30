@@ -14,6 +14,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net.Sockets;
 
+using ToastNotifications;
+using ToastNotifications.Lifetime;
+using ToastNotifications.Position;
+using ToastNotifications.Messages;
+
 namespace NuvolaWPF.Pages.Groups
 {
     /// <summary>
@@ -29,11 +34,13 @@ namespace NuvolaWPF.Pages.Groups
         private void createBtn_Click(object sender, RoutedEventArgs e)
         {
             string name = groupNameBox.Text;
-            string password = passwordBox.Password.ToString();
+            string password = "null";
 
             string data = "206";
-            data += name.Length.ToString().PadLeft(2, '0') + name;
-            data += password.Length.ToString().PadLeft(2, '0') + password;
+            data += name.Length.ToString().PadLeft(2, '0');
+            data += SocketHandler.Encipher(name, "cipher");
+            data += password.Length.ToString().PadLeft(2, '0');
+            data += SocketHandler.Encipher(password, "cipher");
 
             SocketHandler sh = new SocketHandler();
             try
@@ -44,7 +51,6 @@ namespace NuvolaWPF.Pages.Groups
             {
                 // Handle Exception
             }
-
         }
     }
 }

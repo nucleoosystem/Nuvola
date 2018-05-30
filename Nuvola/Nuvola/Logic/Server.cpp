@@ -25,7 +25,7 @@ Server::Server()
 
 Server::~Server()
 {
-	closesocket(_serverSocket);
+	closesocket(_serverSocket); // Close the main server socket
 }
 
 void Server::serve()
@@ -403,7 +403,7 @@ bool Server::handleSignup(ReceivedMessage* msg)
 		bool res = db->addNewUser(msg->getValues()[0], msg->getValues()[1], msg->getValues()[2],
 			msg->getValues()[3]);
 
-		if (res == 0)
+		if (res == 0) // Sending the user the result of the sign-up attempt
 			Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_UP_OTHER_ERROR));
 		else
 			Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_UP_SUCCESS));
@@ -426,13 +426,14 @@ User* Server::handleSignin(ReceivedMessage* msg)
 			Helper::sendData(msg->getSock(), to_string(Protocol::SIGN_IN_SUCCESS));
 		}
 
-		//string vhdPath = Helper::getCurrentPath() + "\\cloudFile.vhd"; // Converting the string to LPCWSTR
-		//std::wstring stemp = Helper::s2ws(vhdPath);
-		//LPCWSTR result = stemp.c_str();
+		string vhdPath = Helper::getCurrentPath() + "\\cloudFile.vhd";
 
-		//int cloudSize = atoi(db->getUserCloudSize(msg->getValues()[0]).c_str());
-		//CreateVirtualDriver(result, cloudSize * 1000 * 1000); // Multiplying by 1000^2 to turn it into gb
-		connectBlockingSocket();
+		std::wstring stemp = Helper::s2ws(vhdPath); // Converting the string to LPCWSTR
+		LPCWSTR result = stemp.c_str();
+
+		int cloudSize = atoi(db->getUserCloudSize(msg->getValues()[0]).c_str());
+		CreateVirtualDriver(result, cloudSize * 1024); // Multiplying by 1000^2 to turn it into gb
+		connectBlockingSocket(); // Connecting the socket for important messages between the client and the server
 
 		this->username = msg->getValues()[0];
 		return new User(msg->getValues()[0], msg->getSock());
@@ -445,17 +446,22 @@ User* Server::handleSignin(ReceivedMessage* msg)
 }
 
 void Server::handleSignout(ReceivedMessage* msg)
-{
-	// TODO : handle user signout
-}
+{}
 
 int Server::handleUploadFile(ReceivedMessage* msg)
 {
 	string filePath = msg->getValues()[0]; // Get the file path that the user wants to send
 	int encrypt = atoi(msg->getValues()[1].c_str()); // Get if the user wants to encrypt the file or not
+	if (encrypt)
+	{
+		// Encrypting the file using the FileEncrypt function
+		string newFileName = Helper::getFileNameFromPath(filePath) + "Encoded." + Helper::getFileExtension(filePath);
+		FileEncrypt::encryptFile(filePath, newFileName, KEY);
+		filePath = newFileName;
+	}
 	vector<string> ips;
 
-	for (int i = 2; i < msg->getValues().size(); i++)
+	for (int i = 2; i < msg->getValues().size(); i++)  
 		ips.push_back(msg->getValues()[i]);
 
 	string ip = ips[0]; // The computer that we send the file to
@@ -468,7 +474,7 @@ int Server::handleUploadFile(ReceivedMessage* msg)
 	{
 		if (ips.size() == 1)
 		{
-			LocalNetFunctions::sendFileToIp(strdup(ips.at(0).c_str()), strdup(filePath.c_str()));
+			LocalNetFunctions::sendFileToIp(strdup(ips.at(0).c_str()), strdup(filePath.c_str()), encrypt);
 		}
 		else
 		{
@@ -490,11 +496,12 @@ int Server::handleUploadFile(ReceivedMessage* msg)
 
 void Server::handleGetUserInfo(ReceivedMessage* msg)
 {	
+	// Adding the found network user to the lists and the database
 	LocalNetFunctions::writeToIpsFile(msg->getIP(), msg->getValues()[0], msg->getValues()[1], msg->getValues()[2]);
 	db->insertNetworkUser(msg->getValues()[0], msg->getValues()[1], msg->getValues()[2]);
-	LocalNetFunctions::addUserToList(msg->getValues()[0], msg->getIP());
+	LocalNetFunctions::addUserToList(msg->getValues()[0], msg->getIP()); 
 
-	if (currentUser)
+	if (currentUser) // Sending the other user info about the user on this computer
 	{
 		string sendString = "102";
 		sendString += Helper::getPaddedNumber(currentUser->getUserName().length(), 2);
@@ -516,12 +523,12 @@ void Server::handleGetUserInfo(ReceivedMessage* msg)
 
 void Server::handleCreateNewGroup(ReceivedMessage* msg)
 {
-	db->insertNewGroup(msg->getValues()[0], msg->getValues()[1]);
+	db->insertNewGroup(msg->getValues()[0], msg->getValues()[1]); // Calling the database to create a new group
 }
 
 void Server::handleAddUserToGroup(ReceivedMessage* msg)
 {
-	string ip = LocalNetFunctions::usernameToIP(msg->getValues()[0]);
+	string ip = LocalNetFunctions::usernameToIP(msg->getValues()[0]); // Getting the IP of the user using its username
 	string message = "You are invited to join the group " + msg->getValues()[1];
 
 	LocalNetFunctions::askUserForPermission(ip, message);
@@ -530,7 +537,7 @@ void Server::handleAddUserToGroup(ReceivedMessage* msg)
 	{
 		string users;
 		string groupName = msg->getValues()[1];
-		for (pair<string, string> group : db->getInfoAboutGroups())
+		for (pair<string, string> group : db->getInfoAboutGroups()) // Getting the group's users
 		{
 			if (group.first == groupName)
 				users = group.second;
@@ -552,10 +559,10 @@ void Server::handleAddUserToGroup(ReceivedMessage* msg)
 
 void Server::handleGetInfoAboutGroups(ReceivedMessage* msg)
 {
-	vector<pair<string, string>> values = db->getInfoAboutGroups();
+	vector<pair<string, string>> values = db->getInfoAboutGroups(); // Getting the information from the database
 
 	int amount = 0;
-	for (int i = 0; i < values.size(); i++)
+	for (int i = 0; i < values.size(); i++) // Checking all groups that contain the user
 	{
 		if (values[i].second.find(this->username) != string::npos) // Checks if the user is in the group 
 			amount++;
@@ -580,7 +587,7 @@ void Server::handleGetInfoAboutGroups(ReceivedMessage* msg)
 string Server::getDriveFreeSpace()
 {
 	CHardDiskManager manager;
-	manager.CheckFreeSpace(L"c:"); // TODO : Change to N
+	manager.CheckFreeSpace(L"N:"); // Using the CHardDiskManager function to check for free drive space
 
 	return to_string(manager.GetTotalNumberOfFreeGBytes());
 }
@@ -614,14 +621,14 @@ void Server::handleUploadFileToGroup(ReceivedMessage* msg)
 	{
 		if (it->first.compare(msg->getValues()[0]) == 0)
 		{
-			users = LocalNetFunctions::split(it->second, '/');
+			users = LocalNetFunctions::split(it->second, '/'); // Getting the users of the given group
 		}
 	}
 	
 	for (auto user : users)
 	{
 		if (LocalNetFunctions::usernameToIP(user) != "")
-			ips.push_back(LocalNetFunctions::usernameToIP(user));
+			ips.push_back(LocalNetFunctions::usernameToIP(user)); // Getting the ips of the online group users
 	}
 
 	if (ips.size() > 0)
@@ -657,7 +664,7 @@ void Server::handleGetAllUsersInfo(ReceivedMessage* msg)
 
 void Server::handleFinishWork(ReceivedMessage* msg)
 {
-	thread findIps(&LocalNetFunctions::getUsersOnNetwork, msg->getSock());
+	thread findIps(&LocalNetFunctions::getUsersOnNetwork, msg->getSock()); // Runs until the server finds all of the online cloud users
 	findIps.detach();
 }
 
@@ -671,18 +678,19 @@ void Server::handleGetAllFilesInfo(ReceivedMessage* msg)
 	vector<vector<string>> values = db->getAllFilesInfo();
 	string data = "106";
 	data += Helper::getPaddedNumber(to_string(values.size()).length(), 2);
-	data += to_string(values.size());
+	data += to_string(values.size()); // Amount of files
 	
 	for (auto it : values)
 	{
-		data += Helper::getPaddedNumber(it[0].length(), 3);
+		data += Helper::getPaddedNumber(it[0].length(), 3); // The file name
 		data += MsgEncrypt::Encipher(it[0], KEY);
-		data += Helper::getPaddedNumber(it[1].length(), 2);
+		data += Helper::getPaddedNumber(it[1].length(), 2); // The file type (jpg, txt...)
 		data += MsgEncrypt::Encipher(it[1], KEY);
-		data += Helper::getPaddedNumber(it[2].length(), 2);
+		data += Helper::getPaddedNumber(it[2].length(), 2); // The file size
 		data += MsgEncrypt::Encipher(it[2], KEY);
-		data += Helper::getPaddedNumber(it[3].length(), 2);
+		data += Helper::getPaddedNumber(it[3].length(), 2); // The user that will receive the file 
 		data += MsgEncrypt::Encipher(it[3], KEY);
+		data += it[4]; // Is Encrypted
 	}
 
 	Helper::sendData(msg->getSock(), data);
@@ -729,14 +737,15 @@ void Server::handleGetFileBack(ReceivedMessage* msg)
 
 void Server::handleRequestToReturnFile(ReceivedMessage* msg)
 {
-	// TODO : Change the file name to point to the filepath
-	LocalNetFunctions::sendFileToIp(strdup(msg->getIP().c_str()), strdup(msg->getValues()[0].c_str()));
+	string fileName = "N:\\" + msg->getValues()[0]; // Getting the path of the requested file
+	LocalNetFunctions::sendFileToIp(strdup(msg->getIP().c_str()), strdup(fileName.c_str()), 0); // Sending the file back to the user
 }
 
 void Server::handleExitGroup(ReceivedMessage* msg)
 {
-	string groupName = msg->getValues()[0];
-	db->deleteUserFromGroup(this->username, groupName);
+	string groupName = msg->getValues()[0]; // Getting the group name from the given arguments
+	db->deleteUserFromGroup(this->username, groupName); // Delete the user from the group
+	db->deleteGroup(groupName); // Delete the group from the database
 }
 
 void Server::handleDeleteVHD(ReceivedMessage* msg)
@@ -776,9 +785,9 @@ void Server::handleInsertNewGroup(ReceivedMessage* msg)
 	string groupName = msg->getValues()[0];
 	vector<string> users = Helper::split(msg->getValues()[1], '/');
 
-	db->insertNewGroup(groupName, "null");
+	db->insertNewGroup(groupName, "null"); // Creating a new group with no users
 	for (string username : users)
 	{
-		db->addUserToGroup(groupName, username);
+		db->addUserToGroup(groupName, username); // Inserting the users into the group
 	}
 }

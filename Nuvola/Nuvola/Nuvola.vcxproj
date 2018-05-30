@@ -54,6 +54,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Program Files\Microsoft CNG Development Kit\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <ShowIncludes>true</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -99,6 +100,7 @@
     <ClCompile Include="Networking\WSAInitializer.cpp" />
     <ClCompile Include="Security\Crypt.cpp" />
     <ClCompile Include="Security\FileEncrypt.cpp" />
+    <ClCompile Include="Security\FileEncryption.cpp" />
     <ClCompile Include="Security\MsgEncrypt.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +120,7 @@
     <ClInclude Include="Networking\WSAInitializer.h" />
     <ClInclude Include="Security\Crypt.h" />
     <ClInclude Include="Security\FileEncrypt.h" />
+    <ClInclude Include="Security\FileEncryption.h" />
     <ClInclude Include="Security\MsgEncrypt.h" />
   </ItemGroup>
   <ItemGroup>

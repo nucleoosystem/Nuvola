@@ -127,9 +127,9 @@ int Helper::getFileSize(string path)
 	std::ifstream f;
 	f.open(path, std::ios_base::binary | std::ios_base::in);
 
-	if (!f.good() || f.eof() || !f.is_open()) 
-	{ 
-		return 0; 
+	if (!f.good() || f.eof() || !f.is_open())
+	{
+		return 0;
 	}
 
 	f.seekg(0, std::ios_base::beg);
@@ -146,8 +146,27 @@ string Helper::getFileExtension(string fileName)
 	return "";
 }
 
+string Helper::getFileNameFromPath(string fileName)
+{
+	const size_t last_slash_idx = fileName.find_last_of("\\/");
+	if (std::string::npos != last_slash_idx)
+	{
+		fileName.erase(0, last_slash_idx + 1);
+	}
+
+	// Remove extension if present.
+	const size_t period_idx = fileName.rfind('.');
+	if (std::string::npos != period_idx)
+	{
+		fileName.erase(period_idx);
+	}
+
+	return fileName;
+}
+
 string Helper::getCurrentPath()
 {
+	// Getting the current working path of the program
 	char buffer[MAX_PATH];
 	GetModuleFileNameA(NULL, buffer, MAX_PATH);
 	string::size_type pos = string(buffer).find_last_of("\\/");
@@ -156,6 +175,7 @@ string Helper::getCurrentPath()
 
 std::wstring Helper::s2ws(const std::string& s)
 {
+	// The function converts a string to a wstring
 	int len;
 	int slength = (int)s.length() + 1;
 	len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
@@ -173,5 +193,20 @@ void Helper::sendBlockingData(SOCKET sc, std::string message)
 	if (send(sc, data, message.size(), 0) == INVALID_SOCKET)
 	{
 		throw std::exception("Error while sending message to client");
+	}
+}
+
+void Helper::moveFileToDrive(const std::string &fileName)
+{
+	string newLoc = "N:\\" + fileName; // Creating the new path of the file
+
+	std::wstring wsFileName = Helper::s2ws(fileName);
+	LPCWSTR lpFileName = wsFileName.c_str();
+	std::wstring wsNewLoc = Helper::s2ws(newLoc);
+	LPCWSTR lpNewLoc = wsNewLoc.c_str(); // Converting the file name and the new location path to LPCWSTR
+
+	if (!MoveFile(lpFileName, lpNewLoc)) // Moving the file to the new location
+	{
+		throw std::exception("Error while moving file to VHD");
 	}
 }

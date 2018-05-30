@@ -1,11 +1,13 @@
 #define WINVER _WIN32_WINNT_WIN7
-#include <windows.h>
+
 #include <iostream>
+#include <windows.h>
 #include <winioctl.h>
 #include <direct.h>
 #include <virtdisk.h>	
 #include <fstream>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -25,7 +27,10 @@ DWORD OpenDisk(PCWSTR virtualDiskFilePath, HANDLE *handle);
 void diskpartCall();
 
 /* The function changes the diskpart commands file based on the given path. */
-void editDiskpartCommands(PCWSTR path);
+void editDiskpartCommands(PCWSTR path, int mbSize);
 
 /* The function deletes the local virtual hard drive. */
 void deleteVirtualHardDriver(string path);
+
+/* The function creates the base of the virtual hard drive. */
+void createVHDFile(int mbSize);

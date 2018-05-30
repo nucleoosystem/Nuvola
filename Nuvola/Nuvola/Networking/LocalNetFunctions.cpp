@@ -306,11 +306,11 @@ int LocalNetFunctions::uploadFileToGroup(string filePath, int encrypt, vector<st
 		return left.second > right.second;
 	});
 
-	sendFileToIp(strdup(ipsAndSizes[0].first.c_str()), strdup(filePath.c_str()));
+	sendFileToIp(strdup(ipsAndSizes[0].first.c_str()), strdup(filePath.c_str()), encrypt);
 	return 0;
 }
 
-int LocalNetFunctions::sendFileToIp(char* ip, char* path)
+int LocalNetFunctions::sendFileToIp(char* ip, char* path, int isEncrypted)
 {
 	WComm w;
 	string rec = " ";
@@ -327,7 +327,7 @@ int LocalNetFunctions::sendFileToIp(char* ip, char* path)
 	w.sendData("EndConnection"); w.recvData(strdup(rec.c_str()), 32);
 
 	Database* db = new Database();
-	db->addFileToDB(path, Helper::getFileExtension(path), LocalNetFunctions::IPToUsername(ip), to_string(Helper::getFileSize(path)));
+	db->addFileToDB(path, Helper::getFileExtension(path), LocalNetFunctions::IPToUsername(ip), to_string(Helper::getFileSize(path)), isEncrypted);
 
 	//delete rec;
 	return 0;
@@ -340,6 +340,7 @@ string LocalNetFunctions::encryptFile(const string& path)
 
 int LocalNetFunctions::receiveFile()
 {
+	string fileName;
 	WComm w;
 	const int port = 8888;
 	// Start Server Daemon
@@ -353,11 +354,11 @@ int LocalNetFunctions::receiveFile()
 		{
 			char rec[50] = "";
 			w.recvData(rec, 32); w.sendData("OK");
-
 			if (strcmp(rec, "FileSend") == 0)
 			{
 				char fname[32] = "";
 				w.fileReceive(fname);
+				fileName = fname;
 				break;
 			}
 			if (strcmp(rec, "EndConnection") == 0)break;
@@ -365,6 +366,16 @@ int LocalNetFunctions::receiveFile()
 		cout << "Finished getting" << endl;
 		// Disconnect client
 		w.closeConnection();
+
+		Database* db = new Database();
+		if (db->isFileEncrypted(fileName))
+		{
+			string filePath = Helper::getCurrentPath() + "\\..\\Nuvola\\" + fileName;
+			string newFileName = "decoded" + fileName;
+			FileEncrypt::decryptFile(filePath, newFileName, "cipher");
+			fileName = newFileName;
+		}
+		Helper::moveFileToDrive(fileName);
 	}
 
 	return 0;

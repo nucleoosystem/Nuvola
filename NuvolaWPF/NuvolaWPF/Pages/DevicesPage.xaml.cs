@@ -80,41 +80,44 @@ namespace NuvolaWPF.Pages
         {
             string fileName = " ";
 
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            // Display OpenFileDialog by calling ShowDialog method
-            Nullable<bool> result = dlg.ShowDialog();
-
-            // Get the selected file name and display in a TextBox
-            if (result == true)
+            if (ipLbl.Content != null)
             {
-                // Open document
-                fileName = dlg.FileName;
+                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+                // Display OpenFileDialog by calling ShowDialog method
+                Nullable<bool> result = dlg.ShowDialog();
 
-                string data = "203" + fileName.Length.ToString().PadLeft(3, '0');
-                data += SocketHandler.Encipher(fileName, "cipher");
-                data += "0"; // No encryption   
-                data += "01" + "1"; // One user
+                // Get the selected file name and display in a TextBox
+                if (result == true)
+                {
+                    // Open document
+                    fileName = dlg.FileName;
 
-                if (ipLbl.Content != null)
-                {
-                    data += ipLbl.Content.ToString().Length.ToString().PadLeft(2, '0');
-                    data += SocketHandler.Encipher(ipLbl.Content.ToString(), "cipher"); 
-                }
+                    string data = "203" + fileName.Length.ToString().PadLeft(3, '0');
+                    data += SocketHandler.Encipher(fileName, "cipher");
+                    data += Convert.ToInt32(encryptBtn.IsChecked); // No encryption   
+                    data += "01" + "1"; // One user
 
-                SocketHandler sh = new SocketHandler();
-                try
-                {
-                    sh.sendData(data);
-                }
-                catch (SocketException ex)
-                {
-                    Notifier n = AsyncBlockingSocket.initNotifier();
-                    n.ShowError(ex.ToString());
-                }
-                catch (Exception ex)
-                {
-                    Notifier n = AsyncBlockingSocket.initNotifier();
-                    n.ShowError(ex.ToString());
+                    if (ipLbl.Content != null)
+                    {
+                        data += ipLbl.Content.ToString().Length.ToString().PadLeft(2, '0');
+                        data += SocketHandler.Encipher(ipLbl.Content.ToString(), "cipher");
+                    }
+
+                    SocketHandler sh = new SocketHandler();
+                    try
+                    {
+                        sh.sendData(data);
+                    }
+                    catch (SocketException ex)
+                    {
+                        Notifier n = AsyncBlockingSocket.initNotifier();
+                        n.ShowError(ex.ToString());
+                    }
+                    catch (Exception ex)
+                    {
+                        Notifier n = AsyncBlockingSocket.initNotifier();
+                        n.ShowError(ex.ToString());
+                    }
                 }
             }
         }

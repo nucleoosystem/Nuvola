@@ -1,4 +1,5 @@
-select vdisk file = C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Nuvola\Debug\cloudFile.vhd
+create vdisk file=C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Stable\Nuvola\Debug\cloudFile.vhd maximum=1024
+select vdisk file = C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\Stable\Nuvola\Debug\cloudFile.vhd
 attach vdisk
 create partition primary
 active

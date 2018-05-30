@@ -45,7 +45,7 @@ public:
 
 	static int uploadFileToGroup(string filePath, int encrypt, vector<string> ips);
 	static int receiveFile();
-	static int sendFileToIp(char* ip, char* path);
+	static int sendFileToIp(char* ip, char* path, int isEncrypted);
 
 	static std::vector<std::string> split(const std::string &text, char sep);
 	static string usernameToIP(string username);

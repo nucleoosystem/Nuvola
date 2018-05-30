@@ -21,7 +21,8 @@
                     <DataGridTextColumn Header = "Name" Binding="{Binding Path=name}" Width="1*" FontSize="20"/>
                     <DataGridTextColumn Header = "Type" Binding="{Binding Path=type}" Width="1*" FontSize="20"/>
                     <DataGridTextColumn Header = "User" Binding="{Binding Path=user}" Width="1*" FontSize="20"/>
-                    <DataGridTextColumn Header = "Size" Binding="{Binding Path=size}" Width="1*" FontSize="20"/>
+                    <DataGridTextColumn Header = "Size [KB]" Binding="{Binding Path=size}" Width="1*" FontSize="20"/>
+                    <DataGridTextColumn Header = "Is Encrypted" Binding="{Binding Path=encrypted}" Width="1*" FontSize="20"/>
                     <DataGridTemplateColumn Header="Retrieve" Width="1*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>

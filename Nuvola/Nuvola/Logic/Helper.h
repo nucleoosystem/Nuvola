@@ -45,8 +45,11 @@ public:
 	static std::vector<std::string> split(const std::string &text, char sep);
 	static int getFileSize(string path);
 	static string getFileExtension(string fileName);
+	static string getFileNameFromPath(string fileName);
 	static string getCurrentPath();
 	static std::wstring s2ws(const std::string& s);
+
+	static void moveFileToDrive(const std::string &fileName);
 
 private:
 	static char* getPartFromSocket(SOCKET sc, int bytesNum);

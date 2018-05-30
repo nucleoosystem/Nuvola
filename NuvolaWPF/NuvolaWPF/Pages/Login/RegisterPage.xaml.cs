@@ -39,24 +39,29 @@ namespace NuvolaWPF.Pages.Login
 
         private void registerBtn_Click(object sender, RoutedEventArgs e)
         {
+            int number = 0;
+            Notifier n = new Notifier(cfg =>
+            {
+                cfg.PositionProvider = new WindowPositionProvider(
+                    parentWindow: this,
+                    corner: Corner.BottomRight,
+                    offsetX: 10,
+                    offsetY: 10);
+
+                cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
+                    notificationLifetime: TimeSpan.FromSeconds(2),
+                    maximumNotificationCount: MaximumNotificationCount.FromCount(1));
+
+                cfg.Dispatcher = Application.Current.Dispatcher;
+            });
+
             if (usernameBox.Text == "" || passwordBox.Password == "" || emailBox.Text == "" || sizeBox.Text == "")
             {
-                Notifier n = new Notifier(cfg =>
-                {
-                    cfg.PositionProvider = new WindowPositionProvider(
-                        parentWindow: this,
-                        corner: Corner.BottomRight,
-                        offsetX: 10,
-                        offsetY: 10);
-
-                    cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
-                        notificationLifetime: TimeSpan.FromSeconds(2),
-                        maximumNotificationCount: MaximumNotificationCount.FromCount(1));
-
-                    cfg.Dispatcher = Application.Current.Dispatcher;
-                });
-
                 n.ShowWarning("Please fill all required values.");
+            }
+            else if(int.TryParse(sizeBox.Text, out number) == false) // Checking if the given size is a number
+            {
+                n.ShowError("The drive size must be a number.");
             }
             else
             {

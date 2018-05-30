@@ -109,8 +109,16 @@ namespace NuvolaWPF
         {
             string fileName = recvData(3);
             int percentage = getMsgCode(); // The legnth of the percentage is 3 so we can use the getMsgCode function
-            precentageNotifier = initPrecentageNotifier();
-            precentageNotifier.ShowInformation("File Upload: " + percentage.ToString() + "%");
+            if (percentage == 0)
+            {
+                precentageNotifier = initPrecentageNotifier();
+                precentageNotifier.ShowInformation("Starting.");
+            }
+            else if(percentage == 100)
+            {
+                precentageNotifier = initPrecentageNotifier();
+                precentageNotifier.ShowInformation("Finished.");
+            }
         }
 
         public void handleInviteToGroup()
@@ -153,7 +161,7 @@ namespace NuvolaWPF
                     offsetY: 10);
 
                 cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
-                    notificationLifetime: TimeSpan.FromSeconds(1),
+                    notificationLifetime: TimeSpan.FromSeconds(4),
                     maximumNotificationCount: MaximumNotificationCount.FromCount(1));
 
                 cfg.Dispatcher = Application.Current.Dispatcher;

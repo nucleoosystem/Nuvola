@@ -19,6 +19,7 @@
 #include "../DB\sqlite3.h"
 #include "Validator.h"
 #include "HardDiskManager.h"
+#include "../Security/FileEncrypt.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 

@@ -1,1 +1,4 @@
-select volume Ndelete volume
+select volume N
+delete volume
+select vdisk file=C:\Users\ShakedNissanov\Documents\SchoolWork\MyWork\CloudProject\NotStable\Nuvola\Debug\cloudFile.vhd
+detach vdisk
